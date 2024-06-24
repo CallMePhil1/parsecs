@@ -18,13 +18,13 @@ private val logger = KotlinLogging.logger {}
 
 const val initializerTemplate = """Array(4096) { %T() }"""
 const val inUseInitializerTemplate = """Array(4096) { %L }"""
-const val growArrayTemplate =
+const val resizeArrayTemplate =
 """%N = Array(size) {
   if (it < %N.size) %N[it]
   else %T()
 }
 """
-const val growInUseArrayTemplate =
+const val resizeInUseArrayTemplate =
 """%N = Array(size) {
   if (it < %N.size) %N[it]
   else false
@@ -32,17 +32,16 @@ const val growInUseArrayTemplate =
 """
 
 val inUseType = Array::class.asTypeName().parameterizedBy(Boolean::class.asClassName())
-val inUsePropSpec = PropertySpec.builder("entityInUseArray", inUseType, KModifier.INTERNAL)
+val inUsePropSpec = PropertySpec.builder("entityInUseArray", inUseType)
     .mutable()
     .initializer(inUseInitializerTemplate, false)
     .build()
 
-val componentsHolderClassName = ClassName("parsecs", Constants.COMPONENT_HOLDER_NAME)
+internal val componentsHolderClassName = ClassName("parsecs", Constants.COMPONENT_HOLDER_NAME)
 
-fun createComponentsHolder(components: Sequence<KSClassDeclaration>): TypeSpec {
+internal fun createComponentsHolder(components: Sequence<KSClassDeclaration>): TypeSpec {
     val holderType = TypeSpec
         .objectBuilder(componentsHolderClassName.simpleName)
-        .addModifiers(KModifier.INTERNAL)
 
     val componentList = components.toList()
 
@@ -57,7 +56,7 @@ fun createComponentsHolder(components: Sequence<KSClassDeclaration>): TypeSpec {
         val arrayType = Array::class.asTypeName().parameterizedBy(componentTypeName)
 
         return@map PropertySpec
-            .builder(formatProperty(componentName), arrayType, KModifier.INTERNAL)
+            .builder(formatProperty(componentName), arrayType)
             .mutable()
             .initializer(initializerTemplate, componentTypeName)
             .build() to componentTypeName
@@ -65,14 +64,14 @@ fun createComponentsHolder(components: Sequence<KSClassDeclaration>): TypeSpec {
     }
 
     propAndComponents.map { it.first }.toMutableList().also { it.add(inUsePropSpec) }.forEach { holderType.addProperty(it) }
-    holderType.addFunction(growFunctionSpec(propAndComponents))
+    holderType.addFunction(resizeFunctionSpec(propAndComponents))
 
     return holderType.build()
 }
 
-fun formatProperty(simpleName: String) = "${simpleName.camelcase()}Array"
+internal fun formatProperty(simpleName: String) = "${simpleName.camelcase()}Array"
 
-fun generateComponentsObject(codeGenerator: CodeGenerator, componentsHolderSpec: TypeSpec) {
+internal fun generateComponentsObject(codeGenerator: CodeGenerator, componentsHolderSpec: TypeSpec) {
     val fileWriter = codeGenerator.createNewFile(Dependencies(false), componentsHolderClassName.packageName, componentsHolderClassName.simpleName).writer()
     val fileSpec = FileSpec.builder(componentsHolderClassName)
 
@@ -80,7 +79,7 @@ fun generateComponentsObject(codeGenerator: CodeGenerator, componentsHolderSpec:
     fileWriter.close()
 }
 
-fun getComponents(resolver: Resolver, files: Sequence<KSFile>): Sequence<KSClassDeclaration> {
+internal fun getComponents(resolver: Resolver, files: Sequence<KSFile>): Sequence<KSClassDeclaration> {
     val componentType = resolver.getClassDeclarationByName<Component>()!!.asType(emptyList())
 
     return files.map { file ->
@@ -91,19 +90,18 @@ fun getComponents(resolver: Resolver, files: Sequence<KSFile>): Sequence<KSClass
     }.flatten()
 }
 
-private fun growFunctionSpec(propsAndComponentNames: List<Pair<PropertySpec, TypeName>>): FunSpec {
-    val funSpec = FunSpec.builder("grow")
-        .addModifiers(KModifier.INTERNAL)
+private fun resizeFunctionSpec(propsAndComponentNames: List<Pair<PropertySpec, TypeName>>): FunSpec {
+    val funSpec = FunSpec.builder("resize")
         .addParameter("size", Int::class)
 
     propsAndComponentNames.forEach {
         val propSpec = it.first
         val componentTypeName = it.second
 
-        funSpec.addCode(growArrayTemplate, propSpec.name, propSpec.name, propSpec.name, componentTypeName)
+        funSpec.addCode(resizeArrayTemplate, propSpec.name, propSpec.name, propSpec.name, componentTypeName)
     }
 
-    funSpec.addCode(growInUseArrayTemplate, inUsePropSpec.name, inUsePropSpec.name, inUsePropSpec.name)
+    funSpec.addCode(resizeInUseArrayTemplate, inUsePropSpec.name, inUsePropSpec.name, inUsePropSpec.name)
 
     return funSpec.build()
 }

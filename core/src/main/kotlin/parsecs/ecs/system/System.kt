@@ -22,5 +22,5 @@ interface RenderSystem: System {
 }
 
 interface UpdateSystem: System {
-    fun update(delta: Float) {}
+    fun update(delta: Float)
 }

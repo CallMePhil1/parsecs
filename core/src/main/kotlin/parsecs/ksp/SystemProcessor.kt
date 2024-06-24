@@ -17,6 +17,24 @@ import parsecs.ext.camelcase
 
 private val logger = KotlinLogging.logger {}
 
+private fun forEachFunctionBody(comonents: List<KSType>, scopeObjectName: String): CodeBlock {
+    val componentCheck = comonents
+        .map { "${Constants.COMPONENT_HOLDER_NAME}.${formatProperty(it.toClassName().simpleName)}[index].inUse" }
+        .joinToString(" && ")
+
+    return CodeBlock.builder()
+        .addStatement("var index = 0")
+        .beginControlFlow("while (index < %N.%N.size)", Constants.COMPONENT_HOLDER_NAME, Constants.ENTITY_IN_USE_ARRAY_NAME)
+        .beginControlFlow("if (%N.%N[index])", Constants.COMPONENT_HOLDER_NAME, Constants.ENTITY_IN_USE_ARRAY_NAME)
+        .beginControlFlow("if (%L)", componentCheck)
+        .addStatement("block(%N, index)", scopeObjectName)
+        .endControlFlow()
+        .endControlFlow()
+        .addStatement("index += 1")
+        .endControlFlow()
+        .build()
+}
+
 /**
  * @param fileSpec The file that contains the system
  * @param scopeTypeSpec Spec for the scope object that was created
@@ -26,22 +44,25 @@ private val logger = KotlinLogging.logger {}
  * Creates the entity class that contains only forEach function that uses the system
  * scope to add receiver functions for [Entity]
  */
-fun createSystemEntityClass(
+internal fun createSystemEntityClass(
     fileSpec: KSFile,
+    components: List<KSType>,
     scopeTypeSpec: TypeSpec,
     systemTypeSpec: KSClassDeclaration
 ): TypeSpec {
     val scopeTypeClassName = ClassName(fileSpec.packageName.asString(), scopeTypeSpec.name!!)
 
-    val forEachLambda = LambdaTypeName.get(scopeTypeClassName, emptyList(), Unit::class.asTypeName())
+    val entityParameter = ParameterSpec.builder("", Entity::class).build()
+    val forEachLambda = LambdaTypeName.get(scopeTypeClassName, listOf(entityParameter), Unit::class.asTypeName())
 
     val forEachFunSpec = FunSpec
         .builder("forEach")
         .addParameter(ParameterSpec.builder("block", forEachLambda).build())
+        .addCode(forEachFunctionBody(components, scopeTypeSpec.name!!))
         .build()
 
     return TypeSpec
-        .classBuilder("${systemTypeSpec.simpleName.asString()}Entities")
+        .objectBuilder("${systemTypeSpec.simpleName.asString()}Entities")
         .addFunction(forEachFunSpec)
         .build()
 }
@@ -52,14 +73,13 @@ fun createSystemEntityClass(
  *
  * Returns scope object that contains receiver functions
  */
-fun createSystemScope(
+internal fun createSystemScope(
     className: ClassName,
     components: List<KSType>
 ): TypeSpec {
     val systemSimpleName = className.simpleName
     val scopeType = TypeSpec
-        .classBuilder("${systemSimpleName}Scope")
-        .addModifiers(KModifier.PUBLIC)
+        .objectBuilder("${systemSimpleName}Scope")
 
     val componentProperties = components.map {
         val componentName = it.toClassName()
@@ -85,7 +105,7 @@ fun createSystemScope(
     return scopeType.build()
 }
 
-fun getSystems(resolver: Resolver, files: Sequence<KSFile>): List<KSClassDeclaration> {
+internal fun getSystems(resolver: Resolver, files: Sequence<KSFile>): List<KSClassDeclaration> {
     val systemInterfaceType = resolver.getClassDeclarationByName<System>()!!.asType(emptyList())
 
     return files
@@ -99,7 +119,7 @@ fun getSystems(resolver: Resolver, files: Sequence<KSFile>): List<KSClassDeclara
         .toList()
 }
 
-fun getSystemComponents(system: KSClassDeclaration): List<KSType> {
+internal fun getSystemComponents(system: KSClassDeclaration): List<KSType> {
     val annotation = system
         .annotations
         .firstOrNull {
@@ -119,9 +139,8 @@ fun getSystemComponents(system: KSClassDeclaration): List<KSType> {
     return with!!.value as List<KSType>
 }
 
-fun generateSystemClasses(
+internal fun generateSystemClasses(
     codeGenerator: CodeGenerator,
-    componentsHolder: ClassName,
     system: KSClassDeclaration,
     systemScope: TypeSpec,
     systemEntityClass: TypeSpec

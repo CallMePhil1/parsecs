@@ -51,14 +51,14 @@ class ParsecsSymbolProcessor(
 
             logger.info { "Created scope '${systemScope.name}' for system '$systemName'" }
 
-            val systemEntityClass = createSystemEntityClass(it.containingFile!!, systemScope, it)
+            logger.info { "Creating entity class for system '$systemName'" }
+
+            val systemEntityClass = createSystemEntityClass(it.containingFile!!, systemComponents, systemScope, it)
 
             logger.info { "Created entity class '${systemEntityClass.name}' for system '$systemName'" }
 
-            generateSystemClasses(codeGenerator, componentsHolderClassName, it, systemScope, systemEntityClass)
+            generateSystemClasses(codeGenerator, it, systemScope, systemEntityClass)
         }
-
-        //generateSystemEntitiesAndScopes(codeGenerator, systems, components)
 
         invoked = true
         return emptyList()
