@@ -29,5 +29,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "parsecs"
-include("parsecs-ecs")
-include("parsecs-ksp")
+include("testmodule")
+include("core")
