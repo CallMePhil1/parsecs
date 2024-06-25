@@ -1,9 +1,10 @@
 package test
 
 import parsecs.ecs.system.UpdateSystem
-import parsecs.ksp.Entities
+import parsecs.entity.Entities
+import parsecs.ksp.SystemEntities
 
-@Entities(
+@SystemEntities(
     with = [TestComponent::class, AnotherComponent::class]
 )
 class TestSystems : UpdateSystem {
@@ -14,13 +15,12 @@ class TestSystems : UpdateSystem {
     }
 }
 
-@Entities(
+@SystemEntities(
     with = [TestComponent::class, AnotherComponent::class, OtherComponent::class]
 )
 class OtherSystems : UpdateSystem {
     override fun update(delta: Float) {
         OtherSystemsEntities.forEach {
-
         }
     }
 }

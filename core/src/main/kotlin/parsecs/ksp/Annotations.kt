@@ -3,6 +3,6 @@ package parsecs.ksp
 import kotlin.reflect.KClass
 
 @Retention(AnnotationRetention.SOURCE)
-annotation class Entities(
+annotation class SystemEntities(
     val with: Array<KClass<*>> = []
 )

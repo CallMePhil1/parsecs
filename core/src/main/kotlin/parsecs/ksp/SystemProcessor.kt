@@ -14,12 +14,13 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import parsecs.ecs.entity.Entity
 import parsecs.ecs.system.System
 import parsecs.ext.camelcase
+import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
 
 private fun forEachFunctionBody(comonents: List<KSType>, scopeObjectName: String): CodeBlock {
     val componentCheck = comonents
-        .map { "${Constants.COMPONENT_HOLDER_NAME}.${formatProperty(it.toClassName().simpleName)}[index].inUse" }
+        .map { "${Constants.COMPONENT_HOLDER_NAME}.${formatArrayProperty(it.toClassName().simpleName)}[index].inUse" }
         .joinToString(" && ")
 
     return CodeBlock.builder()
@@ -93,7 +94,7 @@ internal fun createSystemScope(
             .getter(
                 FunSpec
                     .getterBuilder()
-                    .addCode("return %N.%N[this]", Constants.COMPONENT_HOLDER_NAME, formatProperty(componentName.simpleName))
+                    .addCode("return %N.%N[this]", Constants.COMPONENT_HOLDER_NAME, formatArrayProperty(componentName.simpleName))
                     .build()
             ).build()
     }
@@ -124,7 +125,7 @@ internal fun getSystemComponents(system: KSClassDeclaration): List<KSType> {
         .annotations
         .firstOrNull {
             it.annotationType.resolve()
-                .toClassName() == Entities::class.asClassName()
+                .toClassName() == SystemEntities::class.asClassName()
         }
 
     if (annotation == null) {
@@ -153,7 +154,7 @@ internal fun generateSystemClasses(
 
     FileSpec
         .builder(packageName, systemFileName)
-        .addImport("parsecs", Constants.COMPONENT_HOLDER_NAME)
+        .addImport(componentsHolderClassName.packageName, componentsHolderClassName.simpleName)
         .addType(systemScope)
         .addType(systemEntityClass)
         .build()
@@ -161,5 +162,3 @@ internal fun generateSystemClasses(
 
     fileWriter.close()
 }
-
-

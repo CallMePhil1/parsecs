@@ -37,7 +37,7 @@ val inUsePropSpec = PropertySpec.builder("entityInUseArray", inUseType)
     .initializer(inUseInitializerTemplate, false)
     .build()
 
-internal val componentsHolderClassName = ClassName("parsecs", Constants.COMPONENT_HOLDER_NAME)
+internal val componentsHolderClassName = ClassName("parsecs.components", Constants.COMPONENT_HOLDER_NAME)
 
 internal fun createComponentsHolder(components: Sequence<KSClassDeclaration>): TypeSpec {
     val holderType = TypeSpec
@@ -56,7 +56,7 @@ internal fun createComponentsHolder(components: Sequence<KSClassDeclaration>): T
         val arrayType = Array::class.asTypeName().parameterizedBy(componentTypeName)
 
         return@map PropertySpec
-            .builder(formatProperty(componentName), arrayType)
+            .builder(formatArrayProperty(componentName), arrayType)
             .mutable()
             .initializer(initializerTemplate, componentTypeName)
             .build() to componentTypeName
@@ -69,7 +69,7 @@ internal fun createComponentsHolder(components: Sequence<KSClassDeclaration>): T
     return holderType.build()
 }
 
-internal fun formatProperty(simpleName: String) = "${simpleName.camelcase()}Array"
+internal fun formatArrayProperty(simpleName: String) = "${simpleName.camelcase()}Array"
 
 internal fun generateComponentsObject(codeGenerator: CodeGenerator, componentsHolderSpec: TypeSpec) {
     val fileWriter = codeGenerator.createNewFile(Dependencies(false), componentsHolderClassName.packageName, componentsHolderClassName.simpleName).writer()

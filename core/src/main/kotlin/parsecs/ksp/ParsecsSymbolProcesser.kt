@@ -60,6 +60,10 @@ class ParsecsSymbolProcessor(
             generateSystemClasses(codeGenerator, it, systemScope, systemEntityClass)
         }
 
+        val entitiesObject = createEntitiesObject(components)
+
+        generateEntitiesObject(codeGenerator, entitiesObject)
+
         invoked = true
         return emptyList()
     }
