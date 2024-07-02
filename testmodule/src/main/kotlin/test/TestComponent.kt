@@ -1,6 +1,6 @@
 package test
 
-import parsecs.ecs.Component
+import parsecs.ecs.component.Component
 
 class TestComponent : Component() {
     override fun reset() {

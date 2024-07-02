@@ -1,3 +1,3 @@
 package parsecs.ecs.entity
 
-typealias Entity = Int
+typealias EntityID = Int

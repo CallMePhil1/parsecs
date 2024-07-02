@@ -11,21 +11,21 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.Component
+import parsecs.ecs.component.Component
 import parsecs.ext.camelcase
 
 private val logger = KotlinLogging.logger {}
 
-const val initializerTemplate = """Array(4096) { %T() }"""
-const val inUseInitializerTemplate = """Array(4096) { %L }"""
+const val initializerTemplate = """Array(0) { %T() }"""
+const val inUseInitializerTemplate = """Array(0) { %L }"""
 const val resizeArrayTemplate =
-"""%N = Array(size) {
+"""%N = Array(newSize) {
   if (it < %N.size) %N[it]
   else %T()
 }
 """
 const val resizeInUseArrayTemplate =
-"""%N = Array(size) {
+"""%N = Array(newSize) {
   if (it < %N.size) %N[it]
   else false
 }
@@ -37,7 +37,7 @@ val inUsePropSpec = PropertySpec.builder("entityInUseArray", inUseType)
     .initializer(inUseInitializerTemplate, false)
     .build()
 
-internal val componentsHolderClassName = ClassName("parsecs.components", Constants.COMPONENT_HOLDER_NAME)
+internal val componentsHolderClassName = ClassName("parsecs.components", Constants.DATA_HOLDER_NAME)
 
 internal fun createComponentsHolder(components: Sequence<KSClassDeclaration>): TypeSpec {
     val holderType = TypeSpec
@@ -60,7 +60,6 @@ internal fun createComponentsHolder(components: Sequence<KSClassDeclaration>): T
             .mutable()
             .initializer(initializerTemplate, componentTypeName)
             .build() to componentTypeName
-
     }
 
     propAndComponents.map { it.first }.toMutableList().also { it.add(inUsePropSpec) }.forEach { holderType.addProperty(it) }
@@ -91,8 +90,10 @@ internal fun getComponents(resolver: Resolver, files: Sequence<KSFile>): Sequenc
 }
 
 private fun resizeFunctionSpec(propsAndComponentNames: List<Pair<PropertySpec, TypeName>>): FunSpec {
-    val funSpec = FunSpec.builder("resize")
-        .addParameter("size", Int::class)
+    val funSpec = FunSpec
+        .builder("resize")
+        .addParameter(ParameterSpec.builder("size", Int::class).defaultValue("0").build())
+        .addStatement("val newSize = if (size == 0) { %N.size * 2 } else size", Constants.ENTITY_IN_USE_ARRAY_NAME)
 
     propsAndComponentNames.forEach {
         val propSpec = it.first

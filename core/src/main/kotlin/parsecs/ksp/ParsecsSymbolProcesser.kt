@@ -2,8 +2,8 @@ package parsecs.ksp
 
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
-import com.squareup.kotlinpoet.ksp.toClassName
 import io.github.oshai.kotlinlogging.KotlinLogging
+import parsecs.ksp.entity.*
 import java.time.LocalDateTime
 
 
@@ -34,32 +34,59 @@ class ParsecsSymbolProcessor(
 
         generateComponentsObject(codeGenerator, componentsHolder)
 
+        val extensionProperties = components.map {
+            getComponentExtensionProperties(it)
+        }
+
+        components.zip(extensionProperties).map {
+            getComponentExtensionFile(it.first, it.second)
+        }.forEach {
+            writeComponentExtensionFile(codeGenerator, it)
+        }
+
         logger.info { "Start processing systems" }
 
         val systems = getSystems(resolver, files)
 
-        systems.forEach {
-            val systemName = it.qualifiedName?.asString()
+        systems.forEach { system ->
+            val systemName = system.qualifiedName?.asString()
             logger.info { "Found system '$systemName'" }
 
-            val systemComponents = getSystemComponents(it)
-            logger.info { "Found ${systemComponents.size} component(s) ${systemComponents.joinToString(prefix = "[", postfix = "]")} for system '$systemName'" }
+            val props = getQueryPropertiesFromClass(system)
+            val propString = props.joinToString(prefix = "[", postfix = "]") { it.simpleName.asString() }
 
-            logger.info { "Creating scope for system '$systemName'" }
+            logger.info { "Found ${props.size} component(s) $propString for system '$systemName'" }
 
-            val systemScope = createSystemScope(it.toClassName(), systemComponents)
+            val entitiesClasses = props.map {
+                val queryAnnotation = getQueryAnnotationFromProperty(it)
+                val with = getWithFromQuery(queryAnnotation)
 
-            logger.info { "Created scope '${systemScope.name}' for system '$systemName'" }
+                val forEachFun = getQueryForEachFunSpec(with)
 
-            logger.info { "Creating entity class for system '$systemName'" }
+                return@map getEntityQueryClass(system.simpleName.asString(), it.simpleName.asString(), forEachFun)
+            }
 
-            val systemEntityClass = createSystemEntityClass(it.containingFile!!, systemComponents, systemScope, it)
-
-            logger.info { "Created entity class '${systemEntityClass.name}' for system '$systemName'" }
-
-            generateSystemClasses(codeGenerator, it, systemScope, systemEntityClass)
+            writeEntitiesQueryFile(codeGenerator, getEntityQueryClassFile(system, entitiesClasses))
         }
 
+//            val systemComponents = getSystemComponents(it)
+//            logger.info { "Found ${systemComponents.size} component(s) ${systemComponents.joinToString(prefix = "[", postfix = "]")} for system '$systemName'" }
+//
+//            logger.info { "Creating scope for system '$systemName'" }
+//
+//            val systemScope = createSystemScope(it.toClassName(), systemComponents)
+//
+//            logger.info { "Created scope '${systemScope.name}' for system '$systemName'" }
+//
+//            logger.info { "Creating entity class for system '$systemName'" }
+//
+//            val systemEntityClass = createSystemEntityClass(it.containingFile!!, systemComponents, systemScope, it)
+//
+//            logger.info { "Created entity class '${systemEntityClass.name}' for system '$systemName'" }
+//
+//            generateSystemClasses(codeGenerator, it, systemScope, systemEntityClass)
+//        }
+//
         val entitiesObject = createEntitiesObject(components)
 
         generateEntitiesObject(codeGenerator, entitiesObject)

@@ -1,26 +1,26 @@
 package test
 
 import parsecs.ecs.system.UpdateSystem
-import parsecs.entity.Entities
-import parsecs.ksp.SystemEntities
+import parsecs.ksp.EntityQuery
 
-@SystemEntities(
-    with = [TestComponent::class, AnotherComponent::class]
-)
+
 class TestSystems : UpdateSystem {
-    override fun update(delta: Float) {
-        TestSystemsEntities.forEach {
 
-        }
+    @EntityQuery(
+        with = [TestComponent::class, AnotherComponent::class]
+    )
+    var testQuery: Int = 0
+
+    @EntityQuery(
+        with = [TestComponent::class]
+    )
+    var anotherQuery: Int = 0
+
+    override fun update(delta: Float) {
     }
 }
 
-@SystemEntities(
-    with = [TestComponent::class, AnotherComponent::class, OtherComponent::class]
-)
 class OtherSystems : UpdateSystem {
     override fun update(delta: Float) {
-        OtherSystemsEntities.forEach {
-        }
     }
 }

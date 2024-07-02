@@ -11,22 +11,21 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.entity.Entity
+import parsecs.ecs.entity.EntityID
 import parsecs.ecs.system.System
 import parsecs.ext.camelcase
-import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger {}
 
 private fun forEachFunctionBody(comonents: List<KSType>, scopeObjectName: String): CodeBlock {
     val componentCheck = comonents
-        .map { "${Constants.COMPONENT_HOLDER_NAME}.${formatArrayProperty(it.toClassName().simpleName)}[index].inUse" }
+        .map { "${Constants.DATA_HOLDER_NAME}.${formatArrayProperty(it.toClassName().simpleName)}[index].inUse" }
         .joinToString(" && ")
 
     return CodeBlock.builder()
         .addStatement("var index = 0")
-        .beginControlFlow("while (index < %N.%N.size)", Constants.COMPONENT_HOLDER_NAME, Constants.ENTITY_IN_USE_ARRAY_NAME)
-        .beginControlFlow("if (%N.%N[index])", Constants.COMPONENT_HOLDER_NAME, Constants.ENTITY_IN_USE_ARRAY_NAME)
+        .beginControlFlow("while (index < %N.%N.size)", Constants.DATA_HOLDER_NAME, Constants.ENTITY_IN_USE_ARRAY_NAME)
+        .beginControlFlow("if (%N.%N[index])", Constants.DATA_HOLDER_NAME, Constants.ENTITY_IN_USE_ARRAY_NAME)
         .beginControlFlow("if (%L)", componentCheck)
         .addStatement("block(%N, index)", scopeObjectName)
         .endControlFlow()
@@ -43,7 +42,7 @@ private fun forEachFunctionBody(comonents: List<KSType>, scopeObjectName: String
  * @return [TypeSpec] Entity class for the system that contains foreach for entities the system needs
  *
  * Creates the entity class that contains only forEach function that uses the system
- * scope to add receiver functions for [Entity]
+ * scope to add receiver functions for [EntityID]
  */
 internal fun createSystemEntityClass(
     fileSpec: KSFile,
@@ -53,8 +52,8 @@ internal fun createSystemEntityClass(
 ): TypeSpec {
     val scopeTypeClassName = ClassName(fileSpec.packageName.asString(), scopeTypeSpec.name!!)
 
-    val entityParameter = ParameterSpec.builder("", Entity::class).build()
-    val forEachLambda = LambdaTypeName.get(scopeTypeClassName, listOf(entityParameter), Unit::class.asTypeName())
+    val entityIDParameter = ParameterSpec.builder("", EntityID::class).build()
+    val forEachLambda = LambdaTypeName.get(scopeTypeClassName, listOf(entityIDParameter), Unit::class.asTypeName())
 
     val forEachFunSpec = FunSpec
         .builder("forEach")
@@ -90,11 +89,11 @@ internal fun createSystemScope(
 
         PropertySpec
             .builder(componentName.simpleName.camelcase(), componentTypeName)
-            .receiver(Entity::class)
+            .receiver(EntityID::class)
             .getter(
                 FunSpec
                     .getterBuilder()
-                    .addCode("return %N.%N[this]", Constants.COMPONENT_HOLDER_NAME, formatArrayProperty(componentName.simpleName))
+                    .addCode("return %N.%N[this]", Constants.DATA_HOLDER_NAME, formatArrayProperty(componentName.simpleName))
                     .build()
             ).build()
     }
@@ -120,25 +119,25 @@ internal fun getSystems(resolver: Resolver, files: Sequence<KSFile>): List<KSCla
         .toList()
 }
 
-internal fun getSystemComponents(system: KSClassDeclaration): List<KSType> {
-    val annotation = system
-        .annotations
-        .firstOrNull {
-            it.annotationType.resolve()
-                .toClassName() == SystemEntities::class.asClassName()
-        }
-
-    if (annotation == null) {
-        logger.info { "Could not find 'Entities' annotation for '${system.qualifiedName?.asString()}'" }
-        return emptyList()
-    }
-
-    val with = annotation.arguments.firstOrNull {
-        it.name?.asString() == "with"
-    }
-
-    return with!!.value as List<KSType>
-}
+//internal fun getSystemComponents(system: KSClassDeclaration): List<KSType> {
+//    val annotation = system
+//        .annotations
+//        .firstOrNull {
+//            it.annotationType.resolve()
+//                .toClassName() == SystemEntities::class.asClassName()
+//        }
+//
+//    if (annotation == null) {
+//        logger.info { "Could not find 'Entities' annotation for '${system.qualifiedName?.asString()}'" }
+//        return emptyList()
+//    }
+//
+//    val with = annotation.arguments.firstOrNull {
+//        it.name?.asString() == "with"
+//    }
+//
+//    return with!!.value as List<KSType>
+//}
 
 internal fun generateSystemClasses(
     codeGenerator: CodeGenerator,

@@ -1,4 +1,4 @@
-package parsecs.ecs
+package parsecs.ecs.component
 
 abstract class Component {
     var inUse: Boolean = false
