@@ -25,7 +25,7 @@ class EntityQuery {
         }
     }
 
-    fun has(vararg components: KClass<*>) {
+    fun has(vararg components: KClass<*>) = apply {
         components.forEach {
             if (it.isSubclassOf(Component::class)) {
                 logger.debug { "Add component '${it.qualifiedName}' to has list" }
@@ -36,7 +36,7 @@ class EntityQuery {
         }
     }
 
-    fun notHave(vararg components: KClass<*>) {
+    fun notHave(vararg components: KClass<*>) = apply {
         components.forEach {
             if (it.isSubclassOf(Component::class)) {
                 logger.debug { "Add component '${it.qualifiedName}' to not have list" }

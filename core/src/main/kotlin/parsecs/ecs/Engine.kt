@@ -1,77 +1,42 @@
 package parsecs.ecs
 
-import parsecs.ecs.system.MonitorSystem
-import parsecs.ecs.system.RenderSystem
-import parsecs.ecs.system.System
-import parsecs.ecs.system.UpdateSystem
+import io.github.oshai.kotlinlogging.KotlinLogging
+import parsecs.ecs.system.*
 import parsecs.ext.SystemExt.nanoToSeconds
-import java.lang.System as JavaSystem
+import java.lang.System
 
 object Engine {
-    private var previousNanoSeconds: Long = 0
+    private val logger = KotlinLogging.logger {}
+
     private var deltaRenderTime: Float = 0f
     private var deltaUpdateTime: Float = 0f
+    private var previousNanoSeconds: Long = 0
     private var targetRenderTime: Float = 0f
     private var targetUpdateTime: Float = 0f
-    private val monitorSystems: MutableList<MonitorSystem> = mutableListOf()
-    private val renderSystems: MutableList<RenderSystem> = mutableListOf()
-    private val updateSystems: MutableList<UpdateSystem> = mutableListOf()
 
-    var fpsLimit: Int = 60
+    var fpsLimit: Int = 0
         set(value) {
             targetRenderTime = if (value == 0) 0f else 1f / value
             field = value
         }
 
-    var updateLimit: Int = 0
+    var updatesPerSecond: Int = 0
         set(value) {
             targetUpdateTime = if (value == 0) 0f else 1f / value
             field = value
         }
 
-    private fun addSystem(system: MonitorSystem) {
-        monitorSystems.forEach { it.monitorSystemAdded(system) }
-        monitorSystems.add(system)
-        system.addedToEngine()
-
-        renderSystems.forEach { system.renderSystemAdded(it) }
-        updateSystems.forEach { system.updateSystemAdded(it) }
-    }
-
-    private fun addSystem(system: RenderSystem) {
-        renderSystems.add(system)
-        system.addedToEngine()
-        monitorSystems.forEach { it.renderSystemAdded(system) }
-    }
-
-    private fun addSystem(system: UpdateSystem) {
-        updateSystems.add(system)
-        system.addedToEngine()
-        monitorSystems.forEach { it.updateSystemAdded(system) }
-    }
-
-    fun addSystem(system: System) {
-        if (system is MonitorSystem) {
-            addSystem(system)
-            return
-        }
-
-        if (system is RenderSystem)
-            addSystem(system)
-
-        if (system is UpdateSystem)
-            addSystem(system)
-
-        system.addedToEngine()
+    fun initialize() {
+        logger.info { "Initializing engine" }
     }
 
     fun update() {
-        monitorSystems.forEach { it.engineLoopStart() }
+        Systems.engineLoopStart()
 
         if (previousNanoSeconds == 0L)
-            previousNanoSeconds = java.lang.System.nanoTime()
+            previousNanoSeconds = System.nanoTime()
 
-        val currentNanoSeconds = JavaSystem.nanoTime()
+        val currentNanoSeconds = System.nanoTime()
         val timeDiff = currentNanoSeconds - previousNanoSeconds
         val delta = timeDiff.nanoToSeconds()
 
@@ -79,30 +44,17 @@ object Engine {
         deltaUpdateTime += delta
 
         if (deltaUpdateTime >= targetUpdateTime) {
-            updateSystems.forEach { updater ->
-                monitorSystems.forEach { it.systemLoopStart(updater) }
-                updater.update(deltaUpdateTime)
-                monitorSystems.forEach { it.systemLoopEnd(updater) }
-            }
+            Systems.updateSystemLoop(deltaUpdateTime)
         }
 
         if (deltaRenderTime >= targetRenderTime) {
-            renderSystems.forEach { renderer ->
-                monitorSystems.forEach { it.systemLoopStart(renderer) }
-                renderer.draw(deltaRenderTime)
-                monitorSystems.forEach { it.systemLoopEnd(renderer) }
-            }
+            Systems.renderSystemLoop(deltaRenderTime)
         }
 
-        monitorSystems.forEach { it.engineLoopEnd() }
+        Systems.monitorSystemUpdateLoop(deltaUpdateTime)
+        Systems.monitorSystemRenderLoop(deltaRenderTime)
 
-        monitorSystems.forEach {
-            it.update(deltaUpdateTime)
-        }
-
-        monitorSystems.forEach {
-            it.draw(deltaRenderTime)
-        }
+        Systems.engineLoopEnd()
 
         if (deltaUpdateTime >= targetUpdateTime)
             deltaUpdateTime = 0f

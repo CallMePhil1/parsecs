@@ -1,15 +1,15 @@
 package parsecs.ecs.component
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.entity.Entities
 import parsecs.ecs.entity.EntityID
+import java.lang.reflect.Constructor
 import kotlin.reflect.KClass
 
 typealias ArrayResizer = (size: Int) -> Unit
 typealias ComponentMapper<T> = (EntityID) -> T
 
 object Components {
-    private val logger = KotlinLogging.logger {}
+    val logger = KotlinLogging.logger {}
 
     val componentClasses = mutableListOf<KClass<*>>()
     val componentArrays = mutableListOf<Array<out Component>>()
@@ -19,7 +19,8 @@ object Components {
     internal fun getComponentArray(cls: KClass<*>): Array<out Component> {
         val arrayIndex = componentClasses.indexOf(cls)
 
-        logger.debug { "Could not find array for component '${cls.qualifiedName}'" }
+        if (arrayIndex < 0)
+            logger.error { "Could not find array for component '${cls.qualifiedName}'" }
 
         return componentArrays[arrayIndex]
     }
@@ -38,19 +39,25 @@ object Components {
 
     inline fun <reified T: Component> registerComponent() {
         val cls = T::class
-        val ctor = cls.java.getConstructor()
+        val ctor = cls.java.constructors.firstOrNull { it.parameterCount == 0 } as Constructor<T>?
 
-        if (!componentClasses.contains(cls)) {
-            val index = componentClasses.size
-            componentClasses.add(cls)
-            componentArrays.add(Array(0) { ctor.newInstance() })
-            componentResizer.add { newSize ->
-                val array = componentArrays[index] as Array<T>
-                val newArray = Array(newSize) {
-                    if (it < array.size) array[it]
-                    else ctor.newInstance()
+        if (ctor == null) {
+            logger.error { "Component '${cls.qualifiedName}' does not contain an empty constructor" }
+        }
+
+        ctor!!.let {
+            if (!componentClasses.contains(cls)) {
+                val index = componentClasses.size
+                componentClasses.add(cls)
+                componentArrays.add(Array(0) { ctor.newInstance() })
+                componentResizer.add { newSize ->
+                    val array = componentArrays[index] as Array<T>
+                    val newArray = Array(newSize) {
+                        if (it < array.size) array[it]
+                        else ctor.newInstance()
+                    }
+                    componentArrays[index] = newArray
                 }
-                componentArrays[index] = newArray
             }
         }
     }

@@ -11,7 +11,7 @@ object Entities {
 
     internal var inUse = Array(0) { false }
 
-    internal fun getUnusedEntityID(): Int {
+    fun getUnusedEntityID(): Int {
         if (availableEntityCount <= 0) {
             entityCursor = inUse.size - 1
             resize()

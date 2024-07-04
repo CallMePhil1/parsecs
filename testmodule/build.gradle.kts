@@ -12,7 +12,7 @@ repositories {
 
 dependencies {
     implementation(project(":core"))
-    ksp(project(":core"))
+    //ksp(project(":core"))
     testImplementation(kotlin("test"))
 }
 
