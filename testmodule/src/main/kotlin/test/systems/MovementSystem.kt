@@ -6,7 +6,7 @@ import parsecs.ecs.system.UpdateSystem
 import test.components.PositionComponent
 import test.components.VelocityComponent
 
-class MovementSystem : UpdateSystem {
+internal class MovementSystem : UpdateSystem {
     private val entities = EntityQuery()
         .has(PositionComponent::class, VelocityComponent::class)
 

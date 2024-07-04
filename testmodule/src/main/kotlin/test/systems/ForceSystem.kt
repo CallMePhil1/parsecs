@@ -6,7 +6,7 @@ import parsecs.ecs.system.UpdateSystem
 import test.components.VelocityComponent
 import kotlin.random.Random
 
-class ForceSystem : UpdateSystem {
+internal class ForceSystem : UpdateSystem {
     val entities = EntityQuery()
         .has(VelocityComponent::class)
 
