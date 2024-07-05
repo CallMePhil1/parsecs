@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
+
 plugins {
     kotlin("jvm")
     id("com.google.devtools.ksp")
@@ -19,6 +21,10 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(kotlin("test"))
     implementation(kotlin("reflect"))
+}
+
+tasks.jar {
+    archivesName = "parsecs-core"
 }
 
 tasks.test {
