@@ -9,7 +9,7 @@ import test.systems.ForceSystem
 import test.systems.FpsSystem
 import test.systems.MovementSystem
 
-fun main() {
+internal fun main() {
     Components.registerComponent<PositionComponent>()
     Components.registerComponent<VelocityComponent>()
 
@@ -17,8 +17,8 @@ fun main() {
     Systems.addSystem(ForceSystem())
     Systems.addSystem(FpsSystem())
 
-    Engine.fpsLimit = 30
-    Engine.updatesPerSecond = 60
+//    Engine.fpsLimit = 30
+//    Engine.updatesPerSecond = 60
     Engine.initialize()
 
     while (true) {
