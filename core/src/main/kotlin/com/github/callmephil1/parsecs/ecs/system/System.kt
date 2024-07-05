@@ -1,4 +1,4 @@
-package parsecs.ecs.system
+package com.github.callmephil1.parsecs.ecs.system
 
 interface System {
     fun addedToEngine() {}

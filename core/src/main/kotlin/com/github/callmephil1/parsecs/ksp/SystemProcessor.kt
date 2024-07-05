@@ -1,4 +1,4 @@
-package parsecs.ksp
+package com.github.callmephil1.parsecs.ksp
 
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -11,14 +11,14 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.entity.EntityID
-import parsecs.ecs.system.System
-import parsecs.ext.camelcase
+import com.github.callmephil1.parsecs.ecs.entity.EntityID
+import com.github.callmephil1.parsecs.ecs.system.System
+import com.github.callmephil1.parsecs.ext.camelcase
 
 private val logger = KotlinLogging.logger {}
 
-private fun forEachFunctionBody(comonents: List<KSType>, scopeObjectName: String): CodeBlock {
-    val componentCheck = comonents
+private fun forEachFunctionBody(components: List<KSType>, scopeObjectName: String): CodeBlock {
+    val componentCheck = components
         .map { "${Constants.DATA_HOLDER_NAME}.${formatArrayProperty(it.toClassName().simpleName)}[index].inUse" }
         .joinToString(" && ")
 

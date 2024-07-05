@@ -1,11 +1,10 @@
-package parsecs.ksp
+package com.github.callmephil1.parsecs.ksp
 
+import com.github.callmephil1.parsecs.ksp.entity.*
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ksp.entity.*
 import java.time.LocalDateTime
-
 
 class ParsecsSymbolProcessor(
     private val codeGenerator: CodeGenerator

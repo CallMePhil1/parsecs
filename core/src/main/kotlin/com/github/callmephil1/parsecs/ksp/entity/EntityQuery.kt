@@ -1,4 +1,4 @@
-package parsecs.ksp.entity
+package com.github.callmephil1.parsecs.ksp.entity
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
@@ -9,10 +9,10 @@ import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.toClassName
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.entity.EntityID
-import parsecs.ksp.Constants
-import parsecs.ksp.EntityQuery
-import parsecs.ksp.formatArrayProperty
+import com.github.callmephil1.parsecs.ecs.entity.EntityID
+import com.github.callmephil1.parsecs.ksp.Constants
+import com.github.callmephil1.parsecs.ksp.EntityQuery
+import com.github.callmephil1.parsecs.ksp.formatArrayProperty
 
 private val logger = KotlinLogging.logger {}
 

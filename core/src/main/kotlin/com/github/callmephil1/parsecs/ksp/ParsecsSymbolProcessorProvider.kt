@@ -1,4 +1,4 @@
-package parsecs.ksp
+package com.github.callmephil1.parsecs.ksp
 
 import com.google.devtools.ksp.processing.SymbolProcessor
 import com.google.devtools.ksp.processing.SymbolProcessorEnvironment

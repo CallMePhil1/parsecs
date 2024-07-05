@@ -1,7 +1,7 @@
-package parsecs.ecs.entity
+package com.github.callmephil1.parsecs.ecs.entity
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.component.Components
+import com.github.callmephil1.parsecs.ecs.component.Components
 
 object Entities {
     private val logger = KotlinLogging.logger {}

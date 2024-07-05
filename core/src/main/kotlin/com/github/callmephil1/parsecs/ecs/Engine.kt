@@ -1,8 +1,8 @@
-package parsecs.ecs
+package com.github.callmephil1.parsecs.ecs
 
+import com.github.callmephil1.parsecs.ecs.system.Systems
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.system.*
-import parsecs.ext.SystemExt.nanoToSeconds
+import com.github.callmephil1.parsecs.ext.SystemExt.nanoToSeconds
 import java.lang.System
 
 object Engine {

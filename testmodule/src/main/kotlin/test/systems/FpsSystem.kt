@@ -1,6 +1,6 @@
 package test.systems
 
-import parsecs.ecs.system.MonitorSystem
+import com.github.callmephil1.parsecs.ecs.system.MonitorSystem
 
 internal class FpsSystem : MonitorSystem {
     override fun draw(delta: Float) {

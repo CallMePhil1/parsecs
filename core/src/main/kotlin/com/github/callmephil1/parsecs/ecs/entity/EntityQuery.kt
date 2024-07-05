@@ -1,8 +1,8 @@
-package parsecs.ecs.entity
+package com.github.callmephil1.parsecs.ecs.entity
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.component.Component
-import parsecs.ecs.component.Components
+import com.github.callmephil1.parsecs.ecs.component.Component
+import com.github.callmephil1.parsecs.ecs.component.Components
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSubclassOf
 

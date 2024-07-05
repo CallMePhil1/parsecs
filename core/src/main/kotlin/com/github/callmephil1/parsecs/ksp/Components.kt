@@ -1,12 +1,12 @@
-package parsecs.ksp
+package com.github.callmephil1.parsecs.ksp
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.toClassName
-import parsecs.ecs.entity.EntityID
-import parsecs.ext.camelcase
+import com.github.callmephil1.parsecs.ecs.entity.EntityID
+import com.github.callmephil1.parsecs.ext.camelcase
 
 fun getComponentExtensionFile(componentClass: KSClassDeclaration, extensionProp: PropertySpec): FileSpec {
     val className = componentClass.toClassName()

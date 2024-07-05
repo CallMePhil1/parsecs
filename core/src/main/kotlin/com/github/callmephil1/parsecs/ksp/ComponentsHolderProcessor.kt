@@ -1,4 +1,4 @@
-package parsecs.ksp
+package com.github.callmephil1.parsecs.ksp
 
 import com.google.devtools.ksp.getClassDeclarationByName
 import com.google.devtools.ksp.processing.CodeGenerator
@@ -11,8 +11,8 @@ import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.component.Component
-import parsecs.ext.camelcase
+import com.github.callmephil1.parsecs.ecs.component.Component
+import com.github.callmephil1.parsecs.ext.camelcase
 
 private val logger = KotlinLogging.logger {}
 

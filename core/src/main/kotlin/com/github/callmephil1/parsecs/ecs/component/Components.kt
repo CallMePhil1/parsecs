@@ -1,7 +1,7 @@
-package parsecs.ecs.component
+package com.github.callmephil1.parsecs.ecs.component
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import parsecs.ecs.entity.EntityID
+import com.github.callmephil1.parsecs.ecs.entity.EntityID
 import java.lang.reflect.Constructor
 import kotlin.reflect.KClass
 

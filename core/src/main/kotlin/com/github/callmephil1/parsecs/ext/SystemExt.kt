@@ -1,4 +1,4 @@
-package parsecs.ext
+package com.github.callmephil1.parsecs.ext
 
 object SystemExt {
     fun Long.nanoToMilli(): Float {

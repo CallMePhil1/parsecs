@@ -1,8 +1,8 @@
 package test
 
-import parsecs.ecs.Engine
-import parsecs.ecs.component.Components
-import parsecs.ecs.system.Systems
+import com.github.callmephil1.parsecs.ecs.Engine
+import com.github.callmephil1.parsecs.ecs.component.Components
+import com.github.callmephil1.parsecs.ecs.system.Systems
 import test.components.PositionComponent
 import test.components.VelocityComponent
 import test.systems.ForceSystem

@@ -1,14 +1,14 @@
-package parsecs.ksp.entity
+package com.github.callmephil1.parsecs.ksp.entity
 
 import com.google.devtools.ksp.processing.CodeGenerator
 import com.google.devtools.ksp.processing.Dependencies
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.toClassName
-import parsecs.ecs.entity.EntityID
-import parsecs.ksp.Constants
-import parsecs.ksp.componentsHolderClassName
-import parsecs.ksp.formatArrayProperty
+import com.github.callmephil1.parsecs.ecs.entity.EntityID
+import com.github.callmephil1.parsecs.ksp.Constants
+import com.github.callmephil1.parsecs.ksp.componentsHolderClassName
+import com.github.callmephil1.parsecs.ksp.formatArrayProperty
 
 val getUnusedFunTemplate = """
     if (availableEntityCount <= 0) {

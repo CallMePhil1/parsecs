@@ -1,7 +1,3 @@
-//plugins {
-//    id("org.gradle.toolchains.foojay-resolver-convention") version "0.5.0"
-//}
-
 pluginManagement {
     val kspVersion: String by settings
     val kotlinVersion: String by settings

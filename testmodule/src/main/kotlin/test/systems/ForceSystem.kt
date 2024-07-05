@@ -1,8 +1,8 @@
 package test.systems
 
-import parsecs.ecs.component.Components
-import parsecs.ecs.entity.EntityQuery
-import parsecs.ecs.system.UpdateSystem
+import com.github.callmephil1.parsecs.ecs.component.Components
+import com.github.callmephil1.parsecs.ecs.entity.EntityQuery
+import com.github.callmephil1.parsecs.ecs.system.UpdateSystem
 import test.components.VelocityComponent
 import kotlin.random.Random
 
