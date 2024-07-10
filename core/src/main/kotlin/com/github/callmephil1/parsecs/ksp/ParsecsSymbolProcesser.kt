@@ -3,7 +3,6 @@ package com.github.callmephil1.parsecs.ksp
 import com.github.callmephil1.parsecs.ksp.entity.*
 import com.google.devtools.ksp.processing.*
 import com.google.devtools.ksp.symbol.KSAnnotated
-import io.github.oshai.kotlinlogging.KotlinLogging
 import java.time.LocalDateTime
 
 class ParsecsSymbolProcessor(
@@ -11,7 +10,7 @@ class ParsecsSymbolProcessor(
 ) : SymbolProcessor {
 
     private var invoked: Boolean = false
-    private val logger = KotlinLogging.logger {}
+    private val logger = System.getLogger(ParsecsSymbolProcessor::class.qualifiedName)
 
     override fun process(resolver: Resolver): List<KSAnnotated> {
         if (invoked) {
@@ -19,15 +18,15 @@ class ParsecsSymbolProcessor(
         }
 
         val now = LocalDateTime.now()
-        logger.info { "------ $now ------" }
+        logger.log(System.Logger.Level.INFO) { "------ $now ------" }
 
         val files = resolver.getAllFiles()
 
-        logger.info { "Start processing components" }
+        logger.log(System.Logger.Level.INFO) { "Start processing components" }
 
         val components = getComponents(resolver, files)
 
-        components.forEach { logger.info { "Found component ${it.qualifiedName?.asString()}" } }
+        components.forEach { logger.log(System.Logger.Level.INFO) { "Found component ${it.qualifiedName?.asString()}" } }
 
         val componentsHolder = createComponentsHolder(components)
 
@@ -43,18 +42,18 @@ class ParsecsSymbolProcessor(
             writeComponentExtensionFile(codeGenerator, it)
         }
 
-        logger.info { "Start processing systems" }
+        logger.log(System.Logger.Level.INFO) { "Start processing systems" }
 
         val systems = getSystems(resolver, files)
 
         systems.forEach { system ->
             val systemName = system.qualifiedName?.asString()
-            logger.info { "Found system '$systemName'" }
+            logger.log(System.Logger.Level.INFO) { "Found system '$systemName'" }
 
             val props = getQueryPropertiesFromClass(system)
             val propString = props.joinToString(prefix = "[", postfix = "]") { it.simpleName.asString() }
 
-            logger.info { "Found ${props.size} component(s) $propString for system '$systemName'" }
+            logger.log(System.Logger.Level.INFO) { "Found ${props.size} component(s) $propString for system '$systemName'" }
 
             val entitiesClasses = props.map {
                 val queryAnnotation = getQueryAnnotationFromProperty(it)

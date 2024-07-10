@@ -2,11 +2,11 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.pm20.util.archivesName
 
 plugins {
     kotlin("jvm")
-    id("com.google.devtools.ksp")
+    //id("com.google.devtools.ksp")
 }
 
 group = "com.github.callmephil"
-version = "0.0.1"
+version = "0.0.4"
 
 repositories {
     mavenCentral()
@@ -14,13 +14,11 @@ repositories {
 
 dependencies {
     implementation(libs.kspApi)
-    implementation(libs.kotlinLogger)
     implementation(libs.kotlinpoet)
-    implementation(libs.logback)
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(kotlin("test"))
-    implementation(kotlin("reflect"))
+    api(kotlin("reflect"))
 }
 
 tasks.jar {
@@ -30,6 +28,7 @@ tasks.jar {
 tasks.test {
     useJUnitPlatform()
 }
-kotlin {
-    jvmToolchain(19)
-}
+
+//kotlin {
+//    jvmToolchain(19)
+//}

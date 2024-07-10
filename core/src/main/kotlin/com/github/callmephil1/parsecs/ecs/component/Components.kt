@@ -1,6 +1,5 @@
 package com.github.callmephil1.parsecs.ecs.component
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import com.github.callmephil1.parsecs.ecs.entity.EntityID
 import java.lang.reflect.Constructor
 import kotlin.reflect.KClass
@@ -9,18 +8,24 @@ typealias ArrayResizer = (size: Int) -> Unit
 typealias ComponentMapper<T> = (EntityID) -> T
 
 object Components {
-    val logger = KotlinLogging.logger {}
+    val logger = System.getLogger(Components::class.qualifiedName)
 
     val componentClasses = mutableListOf<KClass<*>>()
     val componentArrays = mutableListOf<Array<out Component>>()
     val componentResizer = mutableListOf<ArrayResizer>()
 
+    fun <T : Component> addComponent(entity: EntityID, cls: KClass<T>, init: T.() -> Unit) {
+        val index = componentClasses.indexOf(cls)
+        val component = componentArrays[index][entity] as T
+        component.inUse = true
+        component.init()
+    }
 
     internal fun getComponentArray(cls: KClass<*>): Array<out Component> {
         val arrayIndex = componentClasses.indexOf(cls)
 
         if (arrayIndex < 0)
-            logger.error { "Could not find array for component '${cls.qualifiedName}'" }
+            logger.log(System.Logger.Level.ERROR) { "Could not find array for component '${cls.qualifiedName}'" }
 
         return componentArrays[arrayIndex]
     }
@@ -42,14 +47,15 @@ object Components {
         val ctor = cls.java.constructors.firstOrNull { it.parameterCount == 0 } as Constructor<T>?
 
         if (ctor == null) {
-            logger.error { "Component '${cls.qualifiedName}' does not contain an empty constructor" }
+            logger.log(System.Logger.Level.ERROR) { "Component '${cls.qualifiedName}' does not contain an empty constructor" }
+            return
         }
 
-        ctor!!.let {
+        ctor.let {
             if (!componentClasses.contains(cls)) {
                 val index = componentClasses.size
                 componentClasses.add(cls)
-                componentArrays.add(Array(0) { ctor.newInstance() })
+                componentArrays.add(Array(1) { ctor.newInstance() })
                 componentResizer.add { newSize ->
                     val array = componentArrays[index] as Array<T>
                     val newArray = Array(newSize) {
@@ -63,7 +69,7 @@ object Components {
     }
 
     internal fun resize(newSize: Int) {
-        logger.debug { "Resizing component arrays to a size of $newSize" }
+        logger.log(System.Logger.Level.DEBUG) { "Resizing component arrays to a size of $newSize" }
         for (i in componentClasses.indices) {
             componentResizer[i].invoke(newSize)
         }

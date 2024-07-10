@@ -1,12 +1,11 @@
 package com.github.callmephil1.parsecs.ecs
 
 import com.github.callmephil1.parsecs.ecs.system.Systems
-import io.github.oshai.kotlinlogging.KotlinLogging
 import com.github.callmephil1.parsecs.ext.SystemExt.nanoToSeconds
 import java.lang.System
 
 object Engine {
-    private val logger = KotlinLogging.logger {}
+    private val logger = System.getLogger(Engine::class.qualifiedName)
 
     private var deltaRenderTime: Float = 0f
     private var deltaUpdateTime: Float = 0f
@@ -27,7 +26,7 @@ object Engine {
         }
 
     fun initialize() {
-        logger.info { "Initializing engine" }
+        logger.log(System.Logger.Level.INFO) { "Initializing engine" }
     }
 
     fun update() {

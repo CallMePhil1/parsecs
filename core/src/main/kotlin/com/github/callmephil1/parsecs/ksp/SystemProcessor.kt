@@ -10,12 +10,11 @@ import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.toClassName
 import com.squareup.kotlinpoet.ksp.toTypeName
-import io.github.oshai.kotlinlogging.KotlinLogging
 import com.github.callmephil1.parsecs.ecs.entity.EntityID
 import com.github.callmephil1.parsecs.ecs.system.System
 import com.github.callmephil1.parsecs.ext.camelcase
 
-private val logger = KotlinLogging.logger {}
+private val logger = java.lang.System.getLogger("SystemProcessor")
 
 private fun forEachFunctionBody(components: List<KSType>, scopeObjectName: String): CodeBlock {
     val componentCheck = components
@@ -83,7 +82,7 @@ internal fun createSystemScope(
 
     val componentProperties = components.map {
         val componentName = it.toClassName()
-        logger.info { "Generating property for '${componentName.canonicalName}'" }
+        logger.log(java.lang.System.Logger.Level.INFO) { "Generating property for '${componentName.canonicalName}'" }
 
         val componentTypeName = it.toTypeName()
 

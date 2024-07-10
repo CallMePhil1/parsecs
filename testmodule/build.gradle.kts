@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("com.google.devtools.ksp")
+    //id("com.google.devtools.ksp")
 }
 
 group = "com.github.callmephil"
@@ -18,8 +18,4 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
-}
-
-kotlin {
-    jvmToolchain(19)
 }

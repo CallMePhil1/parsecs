@@ -8,13 +8,12 @@ import com.google.devtools.ksp.symbol.KSPropertyDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ksp.toClassName
-import io.github.oshai.kotlinlogging.KotlinLogging
 import com.github.callmephil1.parsecs.ecs.entity.EntityID
 import com.github.callmephil1.parsecs.ksp.Constants
 import com.github.callmephil1.parsecs.ksp.EntityQuery
 import com.github.callmephil1.parsecs.ksp.formatArrayProperty
 
-private val logger = KotlinLogging.logger {}
+private val logger = System.getLogger("EntityQuery")
 
 fun getEntityQueryClass(systemName: String, propertyName: String, forEachFunSpec: FunSpec): TypeSpec {
     return TypeSpec.classBuilder("${systemName}${propertyName.capitalize()}")
@@ -58,11 +57,11 @@ fun getQueryForEachFunSpec(with: List<KSType>): FunSpec {
 fun getQueryPropertiesFromClass(cls: KSClassDeclaration): List<KSPropertyDeclaration> =
     cls.getAllProperties().filter { prop ->
         val propertyName = prop.simpleName.asString()
-        logger.debug { "Property: $propertyName annotations: ${prop.annotations.toList().size}" }
+        logger.log(System.Logger.Level.DEBUG) { "Property: $propertyName annotations: ${prop.annotations.toList().size}" }
         val entityQuery = prop.annotations.firstOrNull { it.annotationType.resolve().toClassName() == EntityQuery::class.asClassName() }
 
         if (entityQuery == null) {
-            logger.debug { "Property '$propertyName' does not have 'EntityQuery' annotation" }
+            logger.log(System.Logger.Level.DEBUG) { "Property '$propertyName' does not have 'EntityQuery' annotation" }
             return@filter false
         }
         return@filter true

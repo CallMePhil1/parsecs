@@ -7,6 +7,6 @@ internal class PositionComponent : Component() {
     var y: Float = 0f
 
     override fun reset() {
-        TODO("Not yet implemented")
+
     }
 }

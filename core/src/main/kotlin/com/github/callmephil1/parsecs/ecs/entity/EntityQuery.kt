@@ -1,6 +1,5 @@
 package com.github.callmephil1.parsecs.ecs.entity
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import com.github.callmephil1.parsecs.ecs.component.Component
 import com.github.callmephil1.parsecs.ecs.component.Components
 import kotlin.reflect.KClass
@@ -28,10 +27,10 @@ class EntityQuery {
     fun has(vararg components: KClass<*>) = apply {
         components.forEach {
             if (it.isSubclassOf(Component::class)) {
-                logger.debug { "Add component '${it.qualifiedName}' to has list" }
+                logger.log(System.Logger.Level.DEBUG) { "Add component '${it.qualifiedName}' to has list" }
                 has.add(it)
             } else {
-                logger.debug { "Tried adding component '${it.qualifiedName}' to has list but it does not inherit 'Component'" }
+                logger.log(System.Logger.Level.DEBUG) { "Tried adding component '${it.qualifiedName}' to has list but it does not inherit 'Component'" }
             }
         }
     }
@@ -39,15 +38,15 @@ class EntityQuery {
     fun notHave(vararg components: KClass<*>) = apply {
         components.forEach {
             if (it.isSubclassOf(Component::class)) {
-                logger.debug { "Add component '${it.qualifiedName}' to not have list" }
+                logger.log(System.Logger.Level.DEBUG) { "Add component '${it.qualifiedName}' to not have list" }
                 notHave.add(it)
             } else {
-                logger.debug { "Tried adding component '${it.qualifiedName}' to not have list but it does not inherit 'Component'" }
+                logger.log(System.Logger.Level.DEBUG) { "Tried adding component '${it.qualifiedName}' to not have list but it does not inherit 'Component'" }
             }
         }
     }
 
     companion object {
-        val logger = KotlinLogging.logger {}
+        val logger = System.getLogger(EntityQuery::class.qualifiedName)
     }
 }

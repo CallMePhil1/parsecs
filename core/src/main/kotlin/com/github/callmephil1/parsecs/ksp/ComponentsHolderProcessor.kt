@@ -10,11 +10,12 @@ import com.google.devtools.ksp.symbol.KSFile
 import com.squareup.kotlinpoet.*
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.ksp.toTypeName
-import io.github.oshai.kotlinlogging.KotlinLogging
 import com.github.callmephil1.parsecs.ecs.component.Component
+import com.github.callmephil1.parsecs.ecs.entity.EntityQuery
+import com.github.callmephil1.parsecs.ecs.entity.EntityQuery.Companion
 import com.github.callmephil1.parsecs.ext.camelcase
 
-private val logger = KotlinLogging.logger {}
+private val logger = System.getLogger("ComponentsHolderProcessor")
 
 const val initializerTemplate = """Array(0) { %T() }"""
 const val inUseInitializerTemplate = """Array(0) { %L }"""
@@ -45,13 +46,13 @@ internal fun createComponentsHolder(components: Sequence<KSClassDeclaration>): T
 
     val componentList = components.toList()
 
-    logger.info { "Generating '${componentsHolderClassName.simpleName}' with ${componentList.size} component(s)" }
+    logger.log(System.Logger.Level.INFO) { "Generating '${componentsHolderClassName.simpleName}' with ${componentList.size} component(s)" }
 
     val propAndComponents = componentList.map { component ->
         val componentName = component.simpleName.asString()
         val componentTypeName = component.asType(emptyList()).toTypeName()
 
-        logger.info { "Generating property for $componentName" }
+        logger.log(System.Logger.Level.INFO) { "Generating property for $componentName" }
 
         val arrayType = Array::class.asTypeName().parameterizedBy(componentTypeName)
 
