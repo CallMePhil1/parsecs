@@ -8,7 +8,7 @@ typealias ArrayResizer = (size: Int) -> Unit
 typealias ComponentMapper<T> = (EntityID) -> T
 
 object Components {
-    val logger = System.getLogger(Components::class.qualifiedName)
+    val logger: System.Logger = System.getLogger(Components::class.qualifiedName)
 
     val componentClasses = mutableListOf<KClass<*>>()
     val componentArrays = mutableListOf<Array<out Component>>()

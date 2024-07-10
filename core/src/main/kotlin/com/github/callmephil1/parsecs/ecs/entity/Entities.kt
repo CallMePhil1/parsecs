@@ -7,6 +7,7 @@ object Entities {
 
     private var availableEntityCount = 1
     private var entityCursor = -1
+    internal var tail = 0
 
     internal var inUse = Array(1) { false }
 
@@ -29,11 +30,24 @@ object Entities {
 
             inUse[entityCursor] = true
             availableEntityCount -= 1
+            tail = if (entityCursor > tail) entityCursor else tail
             return entityCursor
         }
 
         entityCursor = -1
         return getUnusedEntityID()
+    }
+
+    internal fun compact() {
+        for(i in inUse.indices.reversed()) {
+            if (inUse[i]) {
+                tail = i
+                entityCursor = if (entityCursor > tail) 0 else entityCursor
+                return
+            }
+        }
+        tail = 0
+        entityCursor = 0
     }
 
     fun releaseEntityID(entityID: EntityID) {
@@ -49,6 +63,7 @@ object Entities {
             if (it < inUse.size) inUse[it]
             else false
         }
+        entityCursor = if (entityCursor >= size) 0 else entityCursor
 
         Components.resize(size)
     }

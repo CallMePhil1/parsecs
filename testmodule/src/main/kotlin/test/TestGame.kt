@@ -21,7 +21,7 @@ internal fun addEntity() {
             Components.addComponent(this, PositionComponent::class) {}
             Components.addComponent(this, VelocityComponent::class) {}
             Components.addComponent(this, LifeSpanComponent::class) {
-                deathTime = Random.nextFloat() * 10
+                deathTime = Random.nextFloat() * (5 until 10).random()
             }
         }
         entityCount += 1
@@ -30,6 +30,7 @@ internal fun addEntity() {
 }
 
 internal fun main() {
+    var stopSpawning = false
     Components.registerComponent<PositionComponent>()
     Components.registerComponent<VelocityComponent>()
     Components.registerComponent<LifeSpanComponent>()
@@ -46,11 +47,10 @@ internal fun main() {
     while (true) {
         Engine.update()
 
-        if (entityCount % 1000 < 50) {
-            println("Another 1000")
-        }
-
-        if (entityCount < 1_000_000_000)
+        if (!stopSpawning && entityCount < 800_000) {
             addEntity()
+        } else {
+            stopSpawning = true
+        }
     }
 }

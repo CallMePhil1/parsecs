@@ -11,11 +11,12 @@ class EntityQuery {
 
     fun forEach(block: (EntityID) -> Unit) {
         val inUse = Entities.inUse
+        val tail = Entities.tail
 
         val hasArrays = has.map { Components.getComponentArray(it) }
         val notHaveArrays = notHave.map { Components.getComponentArray(it) }
 
-        for (i in inUse.indices) {
+        for (i in 0 .. tail) {
             if (inUse[i]) {
                 if (hasArrays.all { it[i].inUse } && notHaveArrays.all { !it[i].inUse }) {
                     block(i)
