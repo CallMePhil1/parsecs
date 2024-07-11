@@ -10,8 +10,8 @@ typealias ComponentMapper<T> = (EntityID) -> T
 object Components {
     val logger: System.Logger = System.getLogger(Components::class.qualifiedName)
 
-    val componentClasses = mutableListOf<KClass<*>>()
     val componentArrays = mutableListOf<Array<out Component>>()
+    val componentClasses = mutableListOf<KClass<*>>()
     val componentResizer = mutableListOf<ArrayResizer>()
 
     fun <T : Component> addComponent(entity: EntityID, cls: KClass<T>, init: T.() -> Unit) {
@@ -28,6 +28,12 @@ object Components {
             logger.log(System.Logger.Level.ERROR) { "Could not find array for component '${cls.qualifiedName}'" }
 
         return componentArrays[arrayIndex]
+    }
+
+    internal fun hardCompact(count: Int) {
+        componentArrays.forEach {
+
+        }
     }
 
     inline fun <reified T: Component> mapper(): ComponentMapper<T> {
@@ -51,11 +57,12 @@ object Components {
             return
         }
 
-        ctor.let {
+        val test = ctor.let {
             if (!componentClasses.contains(cls)) {
+                val initArray = Array(1) { ctor.newInstance() }
                 val index = componentClasses.size
                 componentClasses.add(cls)
-                componentArrays.add(Array(1) { ctor.newInstance() })
+                componentArrays.add(initArray)
                 componentResizer.add { newSize ->
                     val array = componentArrays[index] as Array<T>
                     val newArray = Array(newSize) {
@@ -65,6 +72,7 @@ object Components {
                     componentArrays[index] = newArray
                 }
             }
+            return@let 1
         }
     }
 

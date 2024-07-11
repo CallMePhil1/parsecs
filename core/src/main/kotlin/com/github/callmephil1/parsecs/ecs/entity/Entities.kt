@@ -38,7 +38,22 @@ object Entities {
         return getUnusedEntityID()
     }
 
-    internal fun compact() {
+    fun hardCompact() {
+        val count = inUse.count { true }
+
+
+        for(i in inUse.indices.reversed()) {
+            if (inUse[i]) {
+                tail = i
+                entityCursor = if (entityCursor > tail) 0 else entityCursor
+                return
+            }
+        }
+        tail = 0
+        entityCursor = 0
+    }
+
+    fun softCompact() {
         for(i in inUse.indices.reversed()) {
             if (inUse[i]) {
                 tail = i
