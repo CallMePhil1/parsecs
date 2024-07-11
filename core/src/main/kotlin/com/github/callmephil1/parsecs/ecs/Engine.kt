@@ -38,7 +38,7 @@ object Engine {
         iterationCount += 1
 
         if (iterationCount >= 150) {
-            Entities.compact()
+            Entities.softCompact()
             iterationCount = 0
         }
 

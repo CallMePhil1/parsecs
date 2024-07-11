@@ -48,6 +48,6 @@ class EntityQuery {
     }
 
     companion object {
-        val logger = System.getLogger(EntityQuery::class.qualifiedName)
+        private val logger = System.getLogger(EntityQuery::class.qualifiedName)
     }
 }

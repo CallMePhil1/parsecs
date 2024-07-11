@@ -10,7 +10,7 @@ internal class ForceSystem : UpdateSystem {
     val entities = EntityQuery()
         .has(VelocityComponent::class)
 
-    val velocityMapper = Components.mapper<VelocityComponent>()
+    val velocityMapper = Components.mapper(VelocityComponent::class)
 
     override fun update(delta: Float) {
         entities.forEach {

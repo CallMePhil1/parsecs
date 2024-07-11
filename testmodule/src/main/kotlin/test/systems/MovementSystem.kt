@@ -10,8 +10,8 @@ internal class MovementSystem : UpdateSystem {
     private val entities = EntityQuery()
         .has(PositionComponent::class, VelocityComponent::class)
 
-    val positionMapper = Components.mapper<PositionComponent>()
-    val velocityMapper = Components.mapper<VelocityComponent>()
+    val positionMapper = Components.mapper(PositionComponent::class)
+    val velocityMapper = Components.mapper(VelocityComponent::class)
 
     override fun update(delta: Float) {
         entities.forEach {

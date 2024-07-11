@@ -31,9 +31,9 @@ internal fun addEntity() {
 
 internal fun main() {
     var stopSpawning = false
-    Components.registerComponent<PositionComponent>()
-    Components.registerComponent<VelocityComponent>()
-    Components.registerComponent<LifeSpanComponent>()
+    Components.registerComponent(PositionComponent::class)
+    Components.registerComponent(VelocityComponent::class)
+    Components.registerComponent(LifeSpanComponent::class)
 
     Systems.addSystem(MovementSystem())
     Systems.addSystem(ForceSystem())

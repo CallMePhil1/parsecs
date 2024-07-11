@@ -1,7 +1,6 @@
 package com.github.callmephil1.parsecs.ecs.component
 
 import com.github.callmephil1.parsecs.ecs.entity.EntityID
-import java.lang.reflect.Constructor
 import kotlin.reflect.KClass
 
 typealias ArrayResizer = (size: Int) -> Unit
@@ -10,9 +9,9 @@ typealias ComponentMapper<T> = (EntityID) -> T
 object Components {
     val logger: System.Logger = System.getLogger(Components::class.qualifiedName)
 
-    val componentArrays = mutableListOf<Array<out Component>>()
-    val componentClasses = mutableListOf<KClass<*>>()
-    val componentResizer = mutableListOf<ArrayResizer>()
+    private val componentArrays = mutableListOf<Array<out Component>>()
+    private val componentClasses = mutableListOf<KClass<*>>()
+    private val componentResizer = mutableListOf<ArrayResizer>()
 
     fun <T : Component> addComponent(entity: EntityID, cls: KClass<T>, init: T.() -> Unit) {
         val index = componentClasses.indexOf(cls)
@@ -36,8 +35,7 @@ object Components {
         }
     }
 
-    inline fun <reified T: Component> mapper(): ComponentMapper<T> {
-        val cls = T::class
+    fun <T: Component> mapper(cls: KClass<T>): ComponentMapper<T> {
         val index = componentClasses.indexOf(cls)
 
         if (index == -1)
@@ -48,9 +46,8 @@ object Components {
         }
     }
 
-    inline fun <reified T: Component> registerComponent() {
-        val cls = T::class
-        val ctor = cls.java.constructors.firstOrNull { it.parameterCount == 0 } as Constructor<T>?
+    fun <T: Component> registerComponent(cls: KClass<T>) {
+        val ctor = cls.java.constructors.firstOrNull { it.parameterCount == 0 }
 
         if (ctor == null) {
             logger.log(System.Logger.Level.ERROR) { "Component '${cls.qualifiedName}' does not contain an empty constructor" }
@@ -59,7 +56,8 @@ object Components {
 
         val test = ctor.let {
             if (!componentClasses.contains(cls)) {
-                val initArray = Array(1) { ctor.newInstance() }
+
+                val initArray = Array(1) { ctor.newInstance() as Component }
                 val index = componentClasses.size
                 componentClasses.add(cls)
                 componentArrays.add(initArray)
@@ -67,7 +65,7 @@ object Components {
                     val array = componentArrays[index] as Array<T>
                     val newArray = Array(newSize) {
                         if (it < array.size) array[it]
-                        else ctor.newInstance()
+                        else ctor.newInstance() as Component
                     }
                     componentArrays[index] = newArray
                 }

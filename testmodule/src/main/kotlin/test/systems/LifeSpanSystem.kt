@@ -9,7 +9,7 @@ import test.entityCount
 
 class LifeSpanSystem : UpdateSystem {
     val entities = EntityQuery().has(LifeSpanComponent::class)
-    val lifeSpanMapper = Components.mapper<LifeSpanComponent>()
+    val lifeSpanMapper = Components.mapper(LifeSpanComponent::class)
 
     override fun update(delta: Float) {
         entities.forEach {
