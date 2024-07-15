@@ -1,5 +1,6 @@
 package com.github.callmephil1.parsecs.ecs.entity
 
+import com.github.callmephil1.parsecs.ecs.Engine
 import com.github.callmephil1.parsecs.ecs.component.Components
 
 object Entities {
@@ -11,10 +12,27 @@ object Entities {
 
     internal var inUse = Array(1) { false }
 
+    internal fun entitiesInUse(): List<EntityID> {
+        val inUseCount = inUse.count { it }
+        return ArrayList(inUseCount)
+    }
+
+    internal inline fun forEach(block: (EntityID) -> Unit) {
+        try {
+            for (i in 0 until tail) {
+                if (inUse[i]) {
+                    block(i)
+                }
+            }
+        } catch (e: Exception) {
+            println()
+        }
+    }
+
     fun getUnusedEntityID(): Int {
         if (availableEntityCount <= 0) {
             entityCursor = inUse.size - 1
-            resize()
+            Engine.resize()
             availableEntityCount = entityCursor + 1
         }
 
@@ -39,18 +57,21 @@ object Entities {
     }
 
     fun hardCompact() {
-        val count = inUse.count { true }
+        val inUseCount = inUse.count { it }
 
+        var head = 0
+        var tail = 0
 
-        for(i in inUse.indices.reversed()) {
-            if (inUse[i]) {
-                tail = i
-                entityCursor = if (entityCursor > tail) 0 else entityCursor
-                return
+        while(tail < inUseCount) {
+            if (inUse[tail]) {
+                inUse[head] = inUse[tail]
+                head += 1
             }
+            tail += 1
         }
-        tail = 0
-        entityCursor = 0
+
+        val resizeSize = if (inUseCount <= 0) 1 else inUseCount
+        resize(resizeSize)
     }
 
     fun softCompact() {
@@ -70,16 +91,28 @@ object Entities {
         availableEntityCount += 1
     }
 
+    fun removeAllEntities() {
+        for(i in 0 until tail) {
+            inUse[i] = false
+        }
+        Components.removeAllComponents(tail)
+    }
+
     internal fun resize(newSize: Int = -1) {
-        val size = if (newSize < 0) inUse.size * 2 else newSize
+        val size = when {
+            newSize < 0 -> inUse.size * 2
+            newSize == 0 -> 1
+            else -> newSize
+        }
 
         logger.log(System.Logger.Level.DEBUG) { "Resizing entities array to a size of $size" }
         inUse = Array(size) {
             if (it < inUse.size) inUse[it]
             else false
         }
-        entityCursor = if (entityCursor >= size) 0 else entityCursor
 
-        Components.resize(size)
+        entityCursor = if (entityCursor >= size) 0 else entityCursor
+        availableEntityCount = inUse.count { it }
+        tail = size - 1
     }
 }

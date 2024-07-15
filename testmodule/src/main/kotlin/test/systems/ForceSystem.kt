@@ -7,7 +7,7 @@ import test.components.VelocityComponent
 import kotlin.random.Random
 
 internal class ForceSystem : UpdateSystem {
-    val entities = EntityQuery()
+    private val entities = EntityQuery()
         .has(VelocityComponent::class)
 
     val velocityMapper = Components.mapper(VelocityComponent::class)

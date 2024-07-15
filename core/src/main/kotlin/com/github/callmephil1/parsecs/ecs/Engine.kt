@@ -1,5 +1,6 @@
 package com.github.callmephil1.parsecs.ecs
 
+import com.github.callmephil1.parsecs.ecs.component.Components
 import com.github.callmephil1.parsecs.ecs.entity.Entities
 import com.github.callmephil1.parsecs.ecs.system.Systems
 import com.github.callmephil1.parsecs.ext.SystemExt.nanoToSeconds
@@ -28,8 +29,26 @@ object Engine {
             field = value
         }
 
+    fun hardCompact() {
+        logger.log(System.Logger.Level.DEBUG) { "Hard compacting array of size ${Entities.inUse.size}" }
+        val entitiesInUse = Entities.entitiesInUse()
+        Entities.hardCompact()
+        Components.hardCompact(entitiesInUse)
+    }
+
     fun initialize() {
         logger.log(System.Logger.Level.INFO) { "Initializing engine" }
+    }
+
+    internal fun resize(newSize: Int = -1) {
+        val size = if (newSize < 0) Entities.inUse.size * 2 else newSize
+
+        if (size == 0)
+            println()
+
+        logger.log(System.Logger.Level.DEBUG) { "Engine is resizing arrays to $size" }
+        Entities.resize(size)
+        Components.resize(size)
     }
 
     fun update() {

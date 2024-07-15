@@ -14,9 +14,11 @@ fun generateVersion(): String {
     println("Regex pattern: ${regex.pattern}")
 
     val highestNumber = libsDir.asFileTree.files
+        .filter { it.startsWith(jarPrefix) }
         .map { regex.find(it.name) }
         .map { it?.groups?.get(4)?.value?.toInt() ?: 0 }
-        .maxBy { it }
+        .takeIf { it.isNotEmpty() }
+        ?.maxBy { it } ?: 0
 
     println("Highest version number is $highestNumber")
 

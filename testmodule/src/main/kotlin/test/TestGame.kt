@@ -26,7 +26,7 @@ internal fun addEntity() {
         }
         entityCount += 1
     }
-    println(entityCount)
+//    println(entityCount)
 }
 
 internal fun main() {
@@ -47,10 +47,14 @@ internal fun main() {
     while (true) {
         Engine.update()
 
-        if (!stopSpawning && entityCount < 800_000) {
+        if (!stopSpawning && entityCount < 200_000) {
             addEntity()
-        } else {
+        } else if (!stopSpawning) {
             stopSpawning = true
+            Entities.removeAllEntities()
+            Engine.hardCompact()
+        } else {
+            addEntity()
         }
     }
 }

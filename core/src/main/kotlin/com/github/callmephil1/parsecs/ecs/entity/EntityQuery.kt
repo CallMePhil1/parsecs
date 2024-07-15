@@ -10,17 +10,12 @@ class EntityQuery {
     private val notHave: MutableList<KClass<*>> = mutableListOf()
 
     fun forEach(block: (EntityID) -> Unit) {
-        val inUse = Entities.inUse
-        val tail = Entities.tail
-
         val hasArrays = has.map { Components.getComponentArray(it) }
         val notHaveArrays = notHave.map { Components.getComponentArray(it) }
 
-        for (i in 0 .. tail) {
-            if (inUse[i]) {
-                if (hasArrays.all { it[i].inUse } && notHaveArrays.all { !it[i].inUse }) {
-                    block(i)
-                }
+        Entities.forEach { entityId ->
+            if (hasArrays.all { it[entityId].inUse } && notHaveArrays.all { !it[entityId].inUse }) {
+                block(entityId)
             }
         }
     }

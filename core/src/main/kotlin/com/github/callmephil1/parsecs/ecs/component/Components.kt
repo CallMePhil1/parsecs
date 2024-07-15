@@ -9,7 +9,7 @@ typealias ComponentMapper<T> = (EntityID) -> T
 object Components {
     val logger: System.Logger = System.getLogger(Components::class.qualifiedName)
 
-    private val componentArrays = mutableListOf<Array<out Component>>()
+    private val componentArrays = mutableListOf<Array<Component>>()
     private val componentClasses = mutableListOf<KClass<*>>()
     private val componentResizer = mutableListOf<ArrayResizer>()
 
@@ -20,7 +20,7 @@ object Components {
         component.init()
     }
 
-    internal fun getComponentArray(cls: KClass<*>): Array<out Component> {
+    internal fun getComponentArray(cls: KClass<*>): Array<Component> {
         val arrayIndex = componentClasses.indexOf(cls)
 
         if (arrayIndex < 0)
@@ -29,10 +29,18 @@ object Components {
         return componentArrays[arrayIndex]
     }
 
-    internal fun hardCompact(count: Int) {
-        componentArrays.forEach {
+    internal fun hardCompact(entityIdsInUse: List<EntityID>) {
+        var idIndex = 0
 
+        while(idIndex < entityIdsInUse.size) {
+            val entityId = entityIdsInUse[idIndex]
+
+            componentArrays.forEachIndexed { idx, components ->
+                components[idIndex] = components[entityId]
+            }
+            idIndex += 1
         }
+        resize(entityIdsInUse.size)
     }
 
     fun <T: Component> mapper(cls: KClass<T>): ComponentMapper<T> {
@@ -54,7 +62,7 @@ object Components {
             return
         }
 
-        val test = ctor.let {
+        ctor.let {
             if (!componentClasses.contains(cls)) {
 
                 val initArray = Array(1) { ctor.newInstance() as Component }
@@ -70,7 +78,14 @@ object Components {
                     componentArrays[index] = newArray
                 }
             }
-            return@let 1
+        }
+    }
+
+    internal fun removeAllComponents(endIndex: Int) {
+        for(i in 0 until endIndex) {
+            componentArrays.forEach {
+                it[i].inUse = false
+            }
         }
     }
 
