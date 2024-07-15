@@ -11,8 +11,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/cosmos" />
-            <option value="$PROJECT_DIR$/cosmos/common" />
-            <option value="$PROJECT_DIR$/cosmos/desktop" />
             <option value="$PROJECT_DIR$/testmodule" />
           </set>
         </option>

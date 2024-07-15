@@ -22,6 +22,7 @@ dependencyResolutionManagement {
 
     versionCatalogs {
         create("libs") {
+            library("libgdx-gdx", "com.badlogicgames.gdx", "gdx").version(libgdxVersion)
             library("libgdx-lwjgl3", "com.badlogicgames.gdx", "gdx-backend-lwjgl3").version(libgdxVersion)
             library("libgdx-platform", "com.badlogicgames.gdx", "gdx-platform").version(libgdxVersion)
             library("logback", "ch.qos.logback", "logback-classic").version("1.5.6")
@@ -36,6 +37,4 @@ rootProject.name = "parsecs"
 include("testmodule")
 include("core")
 include("cosmos")
-include("cosmos:common")
-include("cosmos:desktop")
-findProject(":cosmos:desktop")?.name = "desktop"
+include("cosmos:core")
