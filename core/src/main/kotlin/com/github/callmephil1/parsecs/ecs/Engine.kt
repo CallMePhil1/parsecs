@@ -34,6 +34,7 @@ object Engine {
         val entitiesInUse = Entities.entitiesInUse()
         Entities.hardCompact()
         Components.hardCompact(entitiesInUse)
+        System.gc()
     }
 
     fun initialize() {

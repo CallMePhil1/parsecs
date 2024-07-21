@@ -36,5 +36,4 @@ dependencyResolutionManagement {
 rootProject.name = "parsecs"
 include("testmodule")
 include("core")
-include("cosmos")
-include("cosmos:core")
+include("ui")
