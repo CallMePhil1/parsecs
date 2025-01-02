@@ -1,15 +1,10 @@
 package com.github.callmephil1.parsecs.ecs.system
 
 interface System {
-    fun addedToEngine() {}
-    fun removedFromEngine() {}
+    fun engineInitialized() {}
 }
 
-interface MonitorSystem: RenderSystem, UpdateSystem {
-    fun monitorSystemAdded(system: MonitorSystem) {}
-    fun renderSystemAdded(system: RenderSystem) {}
-    fun updateSystemAdded(system: UpdateSystem) {}
-
+interface MonitorSystem: System {
     fun engineLoopStart() {}
     fun engineLoopEnd() {}
 

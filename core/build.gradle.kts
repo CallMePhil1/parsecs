@@ -14,7 +14,7 @@ fun generateVersion(): String {
     println("Regex pattern: ${regex.pattern}")
 
     val highestNumber = libsDir.asFileTree.files
-        .filter { it.startsWith(jarPrefix) }
+        .filter { it.name.startsWith(jarPrefix) }
         .map { regex.find(it.name) }
         .map { it?.groups?.get(4)?.value?.toInt() ?: 0 }
         .takeIf { it.isNotEmpty() }
@@ -27,7 +27,6 @@ fun generateVersion(): String {
 
 plugins {
     kotlin("jvm")
-    //id("com.google.devtools.ksp")
 }
 
 archivesName = "parsec-core"
@@ -39,18 +38,11 @@ repositories {
 }
 
 dependencies {
-    implementation(libs.kspApi)
-    implementation(libs.kotlinpoet)
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(kotlin("test"))
-    api(kotlin("reflect"))
 }
 
 tasks.test {
     useJUnitPlatform()
 }
-
-//kotlin {
-//    jvmToolchain(19)
-//}
