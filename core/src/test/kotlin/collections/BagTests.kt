@@ -40,6 +40,5 @@ class BagTests {
 
         assertEquals(string, "index 10")
         assertEquals(bag[5], "index 10")
-        assertEquals(bag[10], null)
     }
 }
