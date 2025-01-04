@@ -3,7 +3,7 @@ package component
 import com.github.callmephil1.parsecs.ecs.component.ComponentMapper
 import kotlin.test.Test
 
-class TestComponent {
+private class TestComponent {
     var number: Int = -1
 }
 

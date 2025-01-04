@@ -4,7 +4,7 @@ import com.github.callmephil1.parsecs.ecs.entity.Entity
 
 class ComponentService internal constructor() {
     private var mapperCount = 0
-    private val componentMappers = mutableListOf<BaseComponentMapper>()
+    private val componentMappers = mutableListOf<ComponentMapper<*>>()
     private val componentMapperIndices = mutableMapOf<Class<*>, Int>()
 
     fun <T> getMapper(clazz: Class<T>): ComponentMapper<T> {
