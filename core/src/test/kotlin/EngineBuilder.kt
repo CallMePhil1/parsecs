@@ -1,5 +1,5 @@
-import com.github.callmephil1.parsecs.ecs.EngineBuilder
 import com.github.callmephil1.parsecs.ecs.component.ComponentService
+import com.github.callmephil1.parsecs.ecs.engine
 import com.github.callmephil1.parsecs.ecs.entity.EntityService
 import com.github.callmephil1.parsecs.ecs.system.RenderSystem
 import com.github.callmephil1.parsecs.ecs.system.UpdateSystem
@@ -32,12 +32,28 @@ class TestUpdateSystem(
     }
 }
 
+class TestService
+
+class TestService2(private val testService: TestService)
+
 class EngineBuilderTests {
     @Test
     fun `Create an engine builder and add systems it should build successfully`() {
-        val engine = EngineBuilder()
-            .addSystem(TestRenderSystem::class.java)
-            .addSystem(TestUpdateSystem::class.java)
-            .build()
+        val engine = engine {
+            systems {
+                add(TestRenderSystem::class.java)
+                add(TestUpdateSystem::class.java)
+            }
+        }
+    }
+
+    @Test
+    fun `Create an engine builder and add services it should build successfully`() {
+        val engine = engine {
+            services {
+                singleton(TestService::class.java)
+                singleton(TestService2::class.java)
+            }
+        }
     }
 }

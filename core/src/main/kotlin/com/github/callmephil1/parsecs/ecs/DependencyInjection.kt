@@ -64,6 +64,12 @@ class DependencyInjectionBuilder {
     }
 }
 
+fun dependencyInjection(configure: DependencyInjectionBuilder.() -> Unit): DependencyInjection {
+    val builder = DependencyInjectionBuilder()
+    builder.configure()
+    return builder.build()
+}
+
 class DependencyInjection internal constructor(
     private val getters: MutableMap<Class<*>, DependencyInjection.() -> Any>
 ) {
