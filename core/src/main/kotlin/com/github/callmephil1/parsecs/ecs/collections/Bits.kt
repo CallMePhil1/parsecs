@@ -4,12 +4,14 @@ class Bits(
     initialSize: Int = 1
 ) {
 
-    private lateinit var chunks: Array<Int>
+    private var chunks: Array<Int>
     private var count = 0
 
     init {
         chunks = Array(initialSize) { 0 }
     }
+
+    fun clear() = setAll(false)
 
     fun clone(): Bits {
         val newBits = Bits(chunks.size * Int.SIZE_BITS)
