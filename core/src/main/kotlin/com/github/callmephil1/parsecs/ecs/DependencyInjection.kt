@@ -7,7 +7,6 @@ class MissingDependencyError(
 
 class DependencyInjectionBuilder {
     private val getters = mutableMapOf<Class<*>, (DependencyInjection) -> Any>()
-    private val singletons = mutableMapOf<Class<*>, Any>()
 
     fun build(): DependencyInjection = DependencyInjection(getters)
 
@@ -24,23 +23,25 @@ class DependencyInjectionBuilder {
         return this
     }
 
-    fun <T : Any> scoped(clazz: Class<T>, factory: DependencyInjection.() -> T) {
+    fun <T : Any> scoped(clazz: Class<T>, factory: DependencyInjection.() -> T): DependencyInjectionBuilder {
         getters[clazz] = factory
+        return this
     }
 
     fun <T : Any> singleton(clazz: Class<T>): DependencyInjectionBuilder {
         val ctor = clazz.constructors[0]
         val params = ctor.parameterTypes
 
-        val clazzGetter: DependencyInjection.() -> Any = getter@{
-            if (singletons.containsKey(clazz))
-                return@getter singletons[clazz]!!
+        var singleton: T? = null
+
+        val clazzGetter: DependencyInjection.() -> T = getter@{
+            if (singleton != null)
+                return@getter singleton as T
 
             val paramInstances = params.map { this.get(it) }.toTypedArray()
 
-            val service = ctor.newInstance(*paramInstances)!!
-            singletons[clazz] = service
-            return@getter service
+            singleton = ctor.newInstance(*paramInstances)!! as T
+            return@getter singleton as T
         }
 
         getters[clazz] = clazzGetter
@@ -48,13 +49,14 @@ class DependencyInjectionBuilder {
     }
 
     fun <T : Any> singleton(clazz: Class<T>, factory: DependencyInjection.() -> T): DependencyInjectionBuilder {
-        val singletonGetter: DependencyInjection.() -> T = getter@{
-            if (singletons.containsKey(clazz))
-                return@getter singletons[clazz]!! as T
+        var singleton: T? = null
 
-            val service = this.factory()
-            singletons[clazz] = service
-            return@getter service
+        val singletonGetter: DependencyInjection.() -> T = getter@{
+            if (singleton != null)
+                return@getter singleton as T
+
+            singleton = this.factory()
+            return@getter singleton as T
         }
 
         getters[clazz] = singletonGetter
