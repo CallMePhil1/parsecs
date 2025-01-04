@@ -6,6 +6,8 @@ class Entity {
     internal val componentMask = Bits()
     var index = -1
         internal set
-    var isActive = false
+    var version: UInt = 0u
         internal set
+
+    fun ref(): EntityRef = EntityRef(this)
 }

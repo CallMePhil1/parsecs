@@ -21,7 +21,6 @@ class EntityService internal constructor(
     internal fun createEntities() {
         while(!createdEntities.empty()) {
             val entity = createdEntities.pop()
-            entity.isActive = true
 
             for(i in entities.indices) {
                 if (entities[i].isInterested(entity.componentMask))
@@ -29,6 +28,8 @@ class EntityService internal constructor(
             }
         }
     }
+
+    fun get(index: Int) = entityBag[index]
 
     fun newEntity(): Entity {
         val newEntity = obtain()
@@ -62,7 +63,7 @@ class EntityService internal constructor(
 
             entity.index = -1
             entity.componentMask.setAll(false)
-            entity.isActive = false
+            entity.version += 1u
             pool.release(entity)
         }
     }
