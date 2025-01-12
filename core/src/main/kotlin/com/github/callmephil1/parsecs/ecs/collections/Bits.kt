@@ -1,5 +1,7 @@
 package com.github.callmephil1.parsecs.ecs.collections
 
+import kotlin.math.min
+
 class Bits(
     initialSize: Int = 1
 ) {
@@ -17,6 +19,19 @@ class Bits(
         val newBits = Bits(chunks.size * Int.SIZE_BITS)
         chunks.copyInto(newBits.chunks)
         return newBits
+    }
+
+    fun contains(mask: Bits): Boolean {
+        val maxSize = if (chunks.size >= mask.chunks.size) chunks.size else mask.chunks.size
+
+        for (i in 0 ..< maxSize) {
+            val maskChunk = if (i < mask.chunks.size) mask.chunks[i] else 0
+            val thisChunk = if (i < chunks.size) chunks[i] else 0
+
+            if ((thisChunk and maskChunk) != maskChunk)
+                return false
+        }
+        return true
     }
 
     private fun ensureCapcity(target: Int) {
@@ -44,14 +59,18 @@ class Bits(
 
     private fun getChunkIndex(index: Int) = index / (Int.SIZE_BITS - 1)
 
-    fun maskMatch(mask: Bits): Boolean {
-        val maxSize = if (chunks.size >= mask.chunks.size) chunks.size else mask.chunks.size
+    fun intersects(other: Bits): Boolean {
+        val end = min(chunks.size, other.chunks.size) - 1
+        for(i in 0 .. end) {
+            if (chunks[i] and other.chunks[i] != 0)
+                return true
+        }
+        return false
+    }
 
-        for (i in 0 ..< maxSize) {
-            val maskChunk = if (i < mask.chunks.size) mask.chunks[i] else 0
-            val thisChunk = if (i < chunks.size) chunks[i] else 0
-
-            if ((thisChunk and maskChunk) != maskChunk)
+    fun isEmpty(): Boolean {
+        for (i in 0 .. chunks.size) {
+            if (chunks[i] != 0)
                 return false
         }
         return true
