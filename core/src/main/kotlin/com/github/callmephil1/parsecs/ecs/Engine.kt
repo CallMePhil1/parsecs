@@ -11,8 +11,6 @@ class Engine internal constructor(
     private val stopWatch = StopWatch()
     private val logger = System.getLogger(Engine::class.qualifiedName)
 
-    fun newEntity() = entityService.newEntity()
-
     fun update(delta: Float) {
         systemService.engineLoopStart()
 

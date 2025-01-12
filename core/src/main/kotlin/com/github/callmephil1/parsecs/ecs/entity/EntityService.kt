@@ -29,15 +29,20 @@ class EntityService internal constructor(
         }
     }
 
-    fun get(index: Int) = entityBag[index]
-
-    fun newEntity(): Entity {
-        val newEntity = obtain()
-        createdEntities.add(newEntity)
-        return newEntity
+    fun entities(configure: Entities.Builder.() -> Unit): Entities {
+        val builder = Entities.Builder(componentService = componentService, entityService = this)
+        configure(builder)
+        return builder.build()
     }
 
-    fun newEntitiesBuilder() = EntitiesBuilder(componentService = componentService, entityService = this)
+    fun get(index: Int) = entityBag[index]
+
+    fun entity(configure: Entity.() -> Unit): Entity {
+        val newEntity = obtain()
+        createdEntities.add(newEntity)
+        configure(newEntity)
+        return newEntity
+    }
 
     internal fun obtain(): Entity {
         val entity = pool.obtain()

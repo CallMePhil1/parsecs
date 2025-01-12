@@ -10,6 +10,6 @@ class EntityServiceTests {
         val componentService = ComponentService()
         val entityService = EntityService(componentService)
 
-        val entity = entityService.newEntity()
+        val entity = entityService.entity {  }
     }
 }

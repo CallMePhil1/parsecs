@@ -23,9 +23,9 @@ class TestUpdateSystem(
     val entityService: EntityService
 ) : UpdateSystem {
 
-    val entities = entityService.newEntitiesBuilder()
-        .has(TestComponent::class.java)
-        .build()
+    val entities = entityService.entities {
+        all(TestComponent::class.java)
+    }
 
     override fun update(delta: Float) {
 
