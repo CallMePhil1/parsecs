@@ -14,8 +14,8 @@ class ComponentServiceTests {
         val componentService = ComponentService()
         val entityService = EntityService(componentService)
 
-        val entity = entityService.newEntity()
+        val entity = entityService.entity {  }
         val mapper = componentService.getMapper(ComponentTest::class.java)
-        mapper.set(entity, ComponentTest())
+        mapper[entity] = ComponentTest()
     }
 }

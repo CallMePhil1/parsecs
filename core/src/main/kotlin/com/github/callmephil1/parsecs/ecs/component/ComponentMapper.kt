@@ -12,9 +12,9 @@ class ComponentMapper<T> internal constructor(
     private val components = Bag<T>()
     private val pool: Pool<T> = Pool(clazz)
 
-    fun get(index: Int) = components[index]!!
+    operator fun get(index: Int) = components[index]!!
 
-    fun get(entity: Entity) = get(entity.index)
+    operator fun get(entity: Entity) = get(entity.index)
 
     fun getOrNull(entity: Entity) = components[entity.index]
 
@@ -28,7 +28,7 @@ class ComponentMapper<T> internal constructor(
 
     fun release(entity: Entity, with: Entity) = release(entity.index, with.index)
 
-    fun set(entity: Entity, value: T) {
+    operator fun set(entity: Entity, value: T) {
         components[entity.index] = value
         entity.componentMask.setBit(index, true)
     }
