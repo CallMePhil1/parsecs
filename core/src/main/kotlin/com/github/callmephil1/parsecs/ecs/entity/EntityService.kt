@@ -10,7 +10,8 @@ class EntityService internal constructor(
 ) {
 
     private val createdEntities = Stack<Entity>()
-    private val entities  = mutableListOf<Entities>()
+    private val entities = mutableListOf<Entities>()
+    private val updatedEntities = Stack<Entity>()
     private val releasedEntities = Stack<Entity>()
 
     private val entityBag = Bag<Entity>()
@@ -19,10 +20,10 @@ class EntityService internal constructor(
     internal fun addEntities(entities: Entities) = this.entities.add(entities)
 
     internal fun createEntities() {
-        while(!createdEntities.empty()) {
+        while (!createdEntities.empty()) {
             val entity = createdEntities.pop()
 
-            for(i in entities.indices) {
+            for (i in entities.indices) {
                 if (entities[i].isInterested(entity.componentMask))
                     entities[i].add(entity)
             }
@@ -35,14 +36,16 @@ class EntityService internal constructor(
         return builder.build()
     }
 
-    fun get(index: Int) = entityBag[index]
-
     fun entity(configure: Entity.() -> Unit): Entity {
         val newEntity = obtain()
         createdEntities.add(newEntity)
         configure(newEntity)
         return newEntity
     }
+
+    val entityCount get() = entityBag.count
+
+    fun get(index: Int) = entityBag[index]
 
     internal fun obtain(): Entity {
         val entity = pool.obtain()
@@ -51,11 +54,13 @@ class EntityService internal constructor(
         return entity
     }
 
+    fun release(entity: Entity) = releasedEntities.push(entity)
+
     internal fun releaseEntities() {
         while(!releasedEntities.empty()) {
             val entity = releasedEntities.pop()
 
-            for(i in entities.indices) {
+            for (i in entities.indices) {
                 if (entities[i].isInterested(entity.componentMask))
                     entities[i].remove(entity)
             }
@@ -73,5 +78,16 @@ class EntityService internal constructor(
         }
     }
 
-    fun release(entity: Entity) = releasedEntities.push(entity)
+    fun update(entity: Entity) = updatedEntities.push(entity)
+
+    internal fun updateEntities() {
+        while(!updatedEntities.empty()) {
+            val entity = updatedEntities.pop()
+
+            for(i in entities.indices){
+                if (entities[i].isInterested(entity.componentMask))
+                    entities[i].update(entity)
+            }
+        }
+    }
 }
