@@ -11,3 +11,7 @@ class SystemBuilder {
         return systems
     }
 }
+
+inline fun <reified T : System> SystemBuilder.add() {
+    this.add(T::class.java)
+}

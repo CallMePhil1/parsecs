@@ -64,14 +64,19 @@ class DependencyInjectionBuilder {
     }
 }
 
-fun dependencyInjection(configure: DependencyInjectionBuilder.() -> Unit): DependencyInjection {
-    val builder = DependencyInjectionBuilder()
-    builder.configure()
-    return builder.build()
-}
+inline fun <reified T : Any> DependencyInjectionBuilder.scoped() = scoped(T::class.java)
+inline fun <reified T : Any> DependencyInjectionBuilder.scoped(noinline factory: DependencyInjection.() -> T) = scoped(T::class.java, factory)
+inline fun <reified T : Any> DependencyInjectionBuilder.singleton() = singleton(T::class.java)
+inline fun <reified T : Any> DependencyInjectionBuilder.singleton(noinline factory: DependencyInjection.() -> T) = singleton(T::class.java, factory)
 
 class DependencyInjection internal constructor(
     private val getters: MutableMap<Class<*>, DependencyInjection.() -> Any>
 ) {
     fun <T> get(clazz: Class<T>) = getters[clazz]!!.invoke(this) as T
+}
+
+fun dependencyInjection(configure: DependencyInjectionBuilder.() -> Unit): DependencyInjection {
+    val builder = DependencyInjectionBuilder()
+    builder.configure()
+    return builder.build()
 }

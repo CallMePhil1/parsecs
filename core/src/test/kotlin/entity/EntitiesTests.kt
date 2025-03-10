@@ -109,7 +109,6 @@ class EntitiesTests {
         private lateinit var testComponentMapper3: ComponentMapper<TestComponent3>
         private lateinit var testComponentMapper4: ComponentMapper<TestComponent4>
 
-
         @JvmStatic
         @BeforeAll
         fun setUp() {
