@@ -24,11 +24,6 @@ class ComponentService internal constructor() {
 
     internal fun <T> getComponentIndex(clazz: Class<T>) = getMapper(clazz).index
 
-    internal fun <T> hasComponent(entity: Entity, clazz: Class<T>): Boolean {
-        val mapper = getMapper(clazz)
-        return entity.componentMask.getBit(mapper.index)
-    }
-
     internal fun release(entity: Entity, with: Entity) {
         for (i in componentMappers.indices)
             componentMappers[i].release(entity = entity, with = with)
