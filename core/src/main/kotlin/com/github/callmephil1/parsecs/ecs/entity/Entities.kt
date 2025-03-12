@@ -29,7 +29,7 @@ class Entities internal constructor(
             (anyMask == null || entityBits.intersects(anyMask)) &&
             (noneMask == null || !entityBits.intersects(noneMask))
 
-    override fun iterator(): Iterator<Entity> = entities.asSequence().filterNotNull().iterator()
+    override fun iterator(): Iterator<Entity> = entities.iterator() as Iterator<Entity>
 
     fun parallelForEach(block: (Entity) -> Unit) = runBlocking {
         val chunkSize = entities.count / chunkCount
