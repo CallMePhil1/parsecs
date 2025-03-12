@@ -3,9 +3,11 @@ package entity
 import com.github.callmephil1.parsecs.ecs.collections.Bits
 import com.github.callmephil1.parsecs.ecs.component.ComponentMapper
 import com.github.callmephil1.parsecs.ecs.component.ComponentService
+import com.github.callmephil1.parsecs.ecs.entity.Entity
 import com.github.callmephil1.parsecs.ecs.entity.EntityService
 import org.junit.jupiter.api.BeforeAll
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -13,6 +15,9 @@ class TestComponent
 class TestComponent2
 class TestComponent3
 class TestComponent4
+class ParallelTestComponent {
+    var value: Int = 0
+}
 
 class EntitiesTests {
 
@@ -100,6 +105,29 @@ class EntitiesTests {
         assertFalse(entities.isInterested(mismatchBits2))
     }
 
+    @Test
+    fun `Performing a parallelForEach should process all non-null items`() {
+        val entities = entityService.entities {
+            all(ParallelTestComponent::class.java)
+        }
+
+        for (i in 0 .. 1000) {
+            val entity = Entity()
+            entity.index = i
+            parallelTestComponentMapper[entity] = parallelTestComponentMapper.obtain()
+
+            entities.add(entity)
+        }
+
+        entities.parallelForEach {
+            parallelTestComponentMapper[it].value = 2
+        }
+
+        entities.forEach {
+            assertEquals(parallelTestComponentMapper[it].value, 2)
+        }
+    }
+
     companion object {
         private lateinit var componentService: ComponentService
         private lateinit var entityService: EntityService
@@ -108,6 +136,7 @@ class EntitiesTests {
         private lateinit var testComponentMapper2: ComponentMapper<TestComponent2>
         private lateinit var testComponentMapper3: ComponentMapper<TestComponent3>
         private lateinit var testComponentMapper4: ComponentMapper<TestComponent4>
+        private lateinit var parallelTestComponentMapper: ComponentMapper<ParallelTestComponent>
 
         @JvmStatic
         @BeforeAll
@@ -117,6 +146,7 @@ class EntitiesTests {
             testComponentMapper2 = componentService.getMapper(TestComponent2::class.java)
             testComponentMapper3 = componentService.getMapper(TestComponent3::class.java)
             testComponentMapper4 = componentService.getMapper(TestComponent4::class.java)
+            parallelTestComponentMapper = componentService.getMapper(ParallelTestComponent::class.java)
 
             entityService = EntityService(componentService)
         }

@@ -3,6 +3,7 @@ package com.github.callmephil1.parsecs.ecs.entity
 import com.github.callmephil1.parsecs.ecs.collections.Bag
 import com.github.callmephil1.parsecs.ecs.collections.Bits
 import com.github.callmephil1.parsecs.ecs.component.ComponentService
+import kotlinx.coroutines.*
 
 typealias EntitiesListener = (Entity) -> Unit
 
@@ -17,6 +18,7 @@ class Entities internal constructor(
 ) : Iterable<Entity> {
 
     private val entities = Bag<Entity>()
+    private val scope = CoroutineScope(Dispatchers.Default)
 
     internal fun add(entity: Entity) {
         entities.add(entity)
@@ -28,6 +30,31 @@ class Entities internal constructor(
             (noneMask == null || !entityBits.intersects(noneMask))
 
     override fun iterator(): Iterator<Entity> = entities.asSequence().filterNotNull().iterator()
+
+    fun parallelForEach(block: (Entity) -> Unit) = runBlocking {
+        val chunkSize = entities.count / chunkCount
+        val jobs = ArrayList<Job>(chunkCount)
+
+        for(i in 0 ..< chunkCount) {
+            jobs.add(scope.launch {
+                for(idx in i * chunkSize ..< (i + 1) * chunkSize) {
+                    val entity = entities[idx]
+                    if (entity != null)
+                        block(entity)
+                }
+            })
+        }
+
+        jobs.add(scope.launch {
+            for(idx in chunkCount * chunkSize ..< entities.count) {
+                val entity = entities[idx]
+                if (entity != null)
+                    block(entity)
+            }
+        })
+
+        jobs.joinAll()
+    }
 
     internal fun remove(entity: Entity) {
         entities.remove(entity)
@@ -101,5 +128,9 @@ class Entities internal constructor(
                 noneMask!!.setBit(index, true)
             }
         }
+    }
+
+    companion object {
+        private val chunkCount = Runtime.getRuntime().availableProcessors()
     }
 }
