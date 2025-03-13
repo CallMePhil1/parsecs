@@ -78,7 +78,7 @@ class EntityService internal constructor(
         }
     }
 
-    fun update(entity: Entity) = updatedEntities.push(entity)
+    fun update(entity: Entity) { updatedEntities.push(entity) }
 
     internal fun updateEntities() {
         while(!updatedEntities.empty()) {

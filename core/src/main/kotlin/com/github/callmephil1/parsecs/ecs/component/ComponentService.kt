@@ -1,5 +1,6 @@
 package com.github.callmephil1.parsecs.ecs.component
 
+import com.github.callmephil1.parsecs.ecs.component.dsl.Component
 import com.github.callmephil1.parsecs.ecs.entity.Entity
 
 class ComponentService internal constructor() {
@@ -21,6 +22,8 @@ class ComponentService internal constructor() {
         componentMappers.add(newMapper)
         return newMapper
     }
+
+    fun <T> getMapper(component: Component<T>) = getMapper(component.clazz)
 
     internal fun <T> getComponentIndex(clazz: Class<T>) = getMapper(clazz).index
 

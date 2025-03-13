@@ -1,4 +1,4 @@
-import com.github.callmephil1.parsecs.ecs.DependencyInjectionBuilder
+import com.github.callmephil1.parsecs.ecs.DependencyInjection
 import kotlin.test.*
 
 class ScopedClass
@@ -17,7 +17,7 @@ class DependencyInjectionTests {
 
     @Test
     fun `Getting a singleton multiple times returns the same objects`() {
-        val builder = DependencyInjectionBuilder()
+        val builder = DependencyInjection.Builder()
             .singleton(SingletonClass::class.java)
         val app = builder.build()
 
@@ -31,7 +31,7 @@ class DependencyInjectionTests {
 
     @Test
     fun `Getting a scoped service multiple times returns different objects`() {
-        val builder = DependencyInjectionBuilder()
+        val builder = DependencyInjection.Builder()
             .scoped(ScopedClass::class.java)
         val app = builder.build()
 
@@ -45,7 +45,7 @@ class DependencyInjectionTests {
 
     @Test
     fun `Getting a singleton service with scoped dependency returns same objects`() {
-        val app = DependencyInjectionBuilder()
+        val app = DependencyInjection.Builder()
             .singleton(SingletonWithScoped::class.java)
             .scoped(ScopedClass::class.java)
             .build()
@@ -61,7 +61,7 @@ class DependencyInjectionTests {
 
     @Test
     fun `Getting a scoped service with scoped dependency returns different objects`() {
-        val app = DependencyInjectionBuilder()
+        val app = DependencyInjection.Builder()
             .scoped(ScopedClassWithScopedClass::class.java)
             .scoped(ScopedClass::class.java)
             .build()
@@ -77,7 +77,7 @@ class DependencyInjectionTests {
 
     @Test
     fun `Getting a scoped service with singleton dependency returns different scope with equal singleton`() {
-        val app = DependencyInjectionBuilder()
+        val app = DependencyInjection.Builder()
             .scoped(ScopedClassWithSingletonClass::class.java)
             .singleton(SingletonClass::class.java)
             .build()
@@ -93,7 +93,7 @@ class DependencyInjectionTests {
 
     @Test
     fun `Getting a service with a factory returns object from factory`() {
-        val app = DependencyInjectionBuilder()
+        val app = DependencyInjection.Builder()
             .scoped(FactoryClass::class.java) {
                 FactoryClass(10)
             }

@@ -10,7 +10,6 @@ object SystemExt {
     fun Float.nanoToSeconds(): Float {
         return this / 1_000_000_000f
     }
-
     fun Float.secondsToMilli(): Float {
         return this * 1_000
     }
