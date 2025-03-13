@@ -16,8 +16,9 @@ class Engine internal constructor(
     fun update(delta: Float) {
         systemService.engineLoopStart()
 
-        entityService.createEntities()
         entityService.releaseEntities()
+        entityService.updateEntities()
+        entityService.createEntities()
 
         systemService.updateSystemLoop(delta)
 
@@ -27,7 +28,7 @@ class Engine internal constructor(
     }
 
     fun update() {
-        val deltaTime = stopWatch.seconds
+        val deltaTime = stopWatch.seconds / 1000
         stopWatch.start()
         update(deltaTime)
         stopWatch.stop()

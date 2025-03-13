@@ -7,11 +7,9 @@ class SystemBuilder {
         systems.add(system)
     }
 
+    inline fun <reified T : System> add() = this.add(T::class.java)
+
     fun build(): MutableSet<Class<*>> {
         return systems
     }
-}
-
-inline fun <reified T : System> SystemBuilder.add() {
-    this.add(T::class.java)
 }

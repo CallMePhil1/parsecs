@@ -23,7 +23,14 @@ class ComponentService internal constructor() {
         return newMapper
     }
 
-    fun <T> getMapper(component: Component<T>) = getMapper(component.clazz)
+    fun <T> getMapper(component: Component<T>): ComponentMapper<T> {
+        if (component.index == -1) {
+            val mapper = getMapper(component.clazz)
+            component.index = mapper.index
+            componentMappers.add(mapper)
+        }
+        return componentMappers[component.index] as ComponentMapper<T>
+    }
 
     internal fun <T> getComponentIndex(clazz: Class<T>) = getMapper(clazz).index
 

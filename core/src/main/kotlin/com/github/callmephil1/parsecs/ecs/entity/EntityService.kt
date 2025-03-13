@@ -60,6 +60,9 @@ class EntityService internal constructor(
         while(!releasedEntities.empty()) {
             val entity = releasedEntities.pop()
 
+            if (entity.index == -1)
+                continue
+
             for (i in entities.indices) {
                 if (entities[i].isInterested(entity.componentMask))
                     entities[i].remove(entity)
@@ -83,6 +86,9 @@ class EntityService internal constructor(
     internal fun updateEntities() {
         while(!updatedEntities.empty()) {
             val entity = updatedEntities.pop()
+
+            if (entity.index == -1)
+                continue
 
             for(i in entities.indices){
                 if (entities[i].isInterested(entity.componentMask))

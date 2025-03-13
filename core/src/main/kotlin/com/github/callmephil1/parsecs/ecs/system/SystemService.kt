@@ -42,18 +42,6 @@ internal class SystemService internal constructor(
         monitorSystems.forEach { it.engineLoopStart() }
     }
 
-    internal fun monitorSystemRenderLoop(delta: Float) {
-//        monitorSystems.forEach {
-//            it.draw(delta)
-//        }
-    }
-
-    internal fun monitorSystemUpdateLoop(delta: Float) {
-//        monitorSystems.forEach {
-//            it.update(delta)
-//        }
-    }
-
     internal fun renderSystemLoop(delta: Float) {
         renderSystems.forEach { renderer ->
             monitorSystems.forEach { it.systemLoopStart(renderer) }

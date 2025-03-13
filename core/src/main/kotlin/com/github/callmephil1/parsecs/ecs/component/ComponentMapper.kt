@@ -3,6 +3,7 @@ package com.github.callmephil1.parsecs.ecs.component
 import com.github.callmephil1.parsecs.ecs.collections.Bag
 import com.github.callmephil1.parsecs.ecs.collections.Pool
 import com.github.callmephil1.parsecs.ecs.entity.Entity
+import com.github.callmephil1.parsecs.ecs.entity.EntityRef
 
 class ComponentMapper<T> internal constructor(
     val clazz: Class<T>,
@@ -16,9 +17,17 @@ class ComponentMapper<T> internal constructor(
 
     operator fun get(entity: Entity) = get(entity.index)
 
+    operator fun get(entityRef: EntityRef) = get(entityRef.entity.index)
+
+    fun getOrNull(index: Int) = components[index]
+
     fun getOrNull(entity: Entity) = components[entity.index]
 
+    fun getOrNull(entityRef: EntityRef) = components[entityRef.entity.index]
+
     fun has(entity: Entity) = entity.componentMask.getBit(index)
+
+    fun has(entityRef: EntityRef) = has(entityRef.entity)
 
     fun obtain() = pool.obtain()
 

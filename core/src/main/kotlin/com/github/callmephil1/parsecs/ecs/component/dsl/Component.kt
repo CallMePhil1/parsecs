@@ -1,5 +1,6 @@
 package com.github.callmephil1.parsecs.ecs.component.dsl
 
-interface Component<T> {
-    val clazz: Class<T>
+abstract class Component<T> {
+    abstract val clazz: Class<T>
+    internal var index: Int = -1
 }
